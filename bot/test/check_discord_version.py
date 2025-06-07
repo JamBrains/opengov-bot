@@ -26,7 +26,7 @@ def get_latest_version():
             text=True,
             check=False
         )
-        
+
         # Extract version from output
         match = re.search(r"discord\.py \(([0-9.]+)\)", result.stderr)
         if match:
@@ -42,12 +42,12 @@ def main():
     if not installed:
         print("WARNING: discord.py is not installed.")
         return 1
-    
+
     latest = get_latest_version()
     if not latest:
         print(f"INFO: Using discord.py version {installed}. Unable to check for updates.")
         return 0
-    
+
     if version.parse(installed) < version.parse(latest):
         print(f"WARNING: Your discord.py version ({installed}) is outdated. Latest is {latest}.")
         print("The test mocks may not accurately reflect the current Discord API.")

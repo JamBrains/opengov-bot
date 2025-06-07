@@ -709,6 +709,7 @@ async def participation_rate():
 async def before_participation_rate():
     participation_rate.get_task().set_name('participation_rate')
 
+
 @check_governance.before_loop
 async def before_governance():
     check_governance.get_task().set_name('check_governance')
@@ -870,33 +871,33 @@ if __name__ == '__main__':
     async def feedback(interaction: discord.Interaction, message: str):
         """
         Post anonymous feedback about a referendum in the public-discussions channel from the referendas channel
-        
+
         Args:
             interaction (discord.Interaction): The interaction object
             message (str): The feedback message to post
         """
         # Defer the response to give us time to process
         await interaction.response.defer(ephemeral=True)
-        
+
         # Get the user's roles to check permissions
         user_id = interaction.user.id
         member = await interaction.guild.fetch_member(user_id)
         roles = member.roles
-        
+
         # Check if the user has the dao-team-representative role
         has_representative_role = False
         for role in roles:
             if role.name == "dao-team-representative" or role.name == "Admin":
                 has_representative_role = True
                 break
-                
+
         if not has_representative_role:
             await interaction.followup.send(
                 "You don't have permission to use this command. Only users with the @dao-team-representative role can provide feedback.",
                 ephemeral=True
             )
             return
-        
+
         # Check if the command is being used in a thread in the referendas channel
         channel = interaction.channel
         if not isinstance(channel, discord.Thread) or not hasattr(channel, 'parent_id') or channel.parent_id != config.DISCORD_FORUM_CHANNEL_ID:
@@ -905,13 +906,13 @@ if __name__ == '__main__':
                 ephemeral=True
             )
             return
-            
+
         try:
             # Extract the referendum number from the thread name
             # Expected format: "123: Title" or "1234: Title" where the referendum number is the number before the colon
             thread_name = channel.name
             referendum_number = None
-            
+
             # Try to extract the referendum number from the referenda number in the thread name
             match = re.search(r'^#?(\d+):', thread_name)
             if match:
@@ -922,7 +923,7 @@ if __name__ == '__main__':
                     ephemeral=True
                 )
                 return
-                
+
             # Get the public-discussions channel
             public_channel = client.get_channel(config.DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID)
             if not public_channel:
@@ -931,7 +932,7 @@ if __name__ == '__main__':
                     ephemeral=True
                 )
                 return
-                
+
             # Look for an existing thread in public-discussions with the format 'Ref 1234:'
             pattern = rf'^Ref\s+{re.escape(str(referendum_number))}:'
             existing_thread = None
@@ -939,7 +940,7 @@ if __name__ == '__main__':
                 if re.match(pattern, thread.name):
                     existing_thread = thread
                     break
-                    
+
             # If no existing thread is found, create a new one
             if not existing_thread:
                 # Create a new thread in the public-discussions channel
@@ -947,7 +948,7 @@ if __name__ == '__main__':
                 if isinstance(public_channel, discord.ForumChannel):
                     # Prepare the initial post content
                     initial_content = f"This is the public discussion thread for Referendum #{referendum_number}. Team representatives can provide anonymous feedback here."
-                    
+
                     # Check if there are any available tags we should apply
                     applied_tags = []
                     if hasattr(public_channel, 'available_tags') and public_channel.available_tags:
@@ -956,7 +957,7 @@ if __name__ == '__main__':
                             if tag.name.lower() in ['discussion', 'feedback', 'public']:
                                 applied_tags.append(tag)
                                 break
-                    
+
                     # Create a forum post which automatically creates a thread
                     try:
                         new_thread = await public_channel.create_thread(
@@ -982,23 +983,23 @@ if __name__ == '__main__':
                         auto_archive_duration=10080  # 7 days
                     )
                     existing_thread = new_thread
-                
+
             # Post the feedback message to the thread
             await existing_thread.send(f"**Feedback:** {message}")
-            
+
             # Confirm to the user that their feedback was posted
             await interaction.followup.send(
                 f"Your feedback has been anonymously posted to the public-discussions channel.",
                 ephemeral=True
             )
-            
+
         except Exception as error:
             logging.exception(f"An error occurred while processing feedback: {error}")
             await interaction.followup.send(
                 "An error occurred while processing your feedback. Please try again later.",
                 ephemeral=True
             )
-    
+
     # Slash command(s) available when solo mode IS enabled in the .env config
     # Commands:
     #   + /vote <referendum> <conviction> <decision>

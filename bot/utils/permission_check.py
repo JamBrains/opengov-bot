@@ -12,7 +12,7 @@ class PermissionCheck:
             return
 
         perms = channel.permissions_for(guild.me)
-        # There are some edge cases where the permissions is not checked correctly as channels can override 
+        # There are some edge cases where the permissions is not checked correctly as channels can override
         if not perms.manage_roles:
             self.logging.warning(f"'Manage Roles' permission in channel {channel.name} for {guild.name}")
         if not perms.manage_threads:

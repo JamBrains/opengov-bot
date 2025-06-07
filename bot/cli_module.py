@@ -52,10 +52,10 @@ def setup_test_parser(subparsers):
 def setup_test_env_parser(subparsers):
     """Set up the parser for the test-env command"""
     test_env_parser = subparsers.add_parser('test-env', help='Run the bot in a test environment with simulated Discord server')
-    test_env_parser.add_argument('--scenario', choices=['default', 'voting', 'custom'], default='default', 
+    test_env_parser.add_argument('--scenario', choices=['default', 'voting', 'custom'], default='default',
                                help='Test scenario to run (default: default)')
     test_env_parser.add_argument('--debug', action='store_true', help='Enable debug output')
-    test_env_parser.add_argument('--duration', type=int, default=60, 
+    test_env_parser.add_argument('--duration', type=int, default=60,
                                help='Duration to run the test environment in seconds (default: 60)')
 
 
@@ -77,82 +77,82 @@ def setup_config_parser(subparsers):
 def handle_test_command(args):
     """Handle the test command"""
     from bot.cli.test_runner import (
-        run_unit_tests, 
-        run_integration_tests, 
-        run_scheduled_tasks_tests, 
+        run_unit_tests,
+        run_integration_tests,
+        run_scheduled_tasks_tests,
         run_ongoing_ref_tests
     )
-    
+
     # Set environment variable for real API usage if specified
     if args.use_real_apis:
         os.environ['USE_REAL_APIS'] = 'true'
     else:
         os.environ['USE_REAL_APIS'] = 'false'
-    
+
     # Track overall success
     success = True
-    
+
     # Run the specified tests
     if args.unit or args.all:
         if not run_unit_tests(quiet=args.quiet, timeout=args.timeout):
             success = False
-    
+
     if args.integration or args.all:
         if not run_integration_tests(quiet=args.quiet, timeout=args.timeout):
             success = False
-    
+
     if args.scheduled_tasks or args.api or args.all:
         if not run_scheduled_tasks_tests(quiet=args.quiet, timeout=args.timeout):
             success = False
-    
+
     if args.ongoing_ref or args.api or args.all:
         if not run_ongoing_ref_tests(quiet=args.quiet, timeout=args.timeout):
             success = False
-    
+
     # If no specific tests were specified, run unit tests by default
     if not (args.unit or args.integration or args.api or args.scheduled_tasks or args.ongoing_ref or args.all):
         if not run_unit_tests(quiet=args.quiet, timeout=args.timeout):
             success = False
-    
+
     return 0 if success else 1
 
 
 def handle_test_env_command(args):
     """Handle the test-env command"""
     print(f"Starting JAM DAO Discord Bot in test environment with scenario: {args.scenario}")
-    
+
     if args.debug:
         print("Debug output enabled")
         # Set debug environment variable
         os.environ['DEBUG'] = 'true'
-    
+
     # Set scenario environment variable
     os.environ['TEST_SCENARIO'] = args.scenario
-    
+
     # Set duration environment variable if specified
     if args.duration:
         os.environ['TEST_DURATION'] = str(args.duration)
-    
+
     # Import and run the test environment
     from bot.cli.test_env import main as run_test_env
     run_test_env()
-    
+
     return 0
 
 
 def handle_start_command(args):
     """Handle the start command"""
     print("Starting JAM DAO Discord Bot...")
-    
+
     if args.dev:
         print("Development mode enabled")
-    
+
     if args.debug:
         print("Debug logging enabled")
-    
+
     # TODO: Implement bot startup logic
     print("Bot startup not yet implemented")
-    
+
     return 0
 
 
@@ -170,7 +170,7 @@ def handle_config_command(args):
         # TODO: Implement configuration getting
     else:
         print("No config action specified. Use --list, --set, or --get")
-    
+
     return 0
 
 
@@ -181,16 +181,16 @@ def main():
         description='JAM DAO Discord Bot CLI'
     )
     subparsers = parser.add_subparsers(dest='command', help='Command to run')
-    
+
     # Set up command parsers
     setup_test_parser(subparsers)
     setup_test_env_parser(subparsers)
     setup_start_parser(subparsers)
     setup_config_parser(subparsers)
-    
+
     # Parse arguments
     args = parser.parse_args()
-    
+
     # Handle commands
     if args.command == 'test':
         return handle_test_command(args)

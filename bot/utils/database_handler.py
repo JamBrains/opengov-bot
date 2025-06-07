@@ -15,12 +15,12 @@ class DatabaseHandler:
             3: 'recuse',
             4: 'abstain'
         }
-        
+
     def fetch_vote_counts_from_db(self, message_id: str):
         with self.conn.cursor() as cursor:
             cursor.execute("""
-                SELECT aye, nay, recuse 
-                FROM referenda_thread 
+                SELECT aye, nay, recuse
+                FROM referenda_thread
                 WHERE thread_id = %s;
             """, (message_id,))
             result = cursor.fetchone()
@@ -40,7 +40,7 @@ class DatabaseHandler:
                         INSERT INTO referenda_thread (thread_id, aye, nay, recuse, abstain, epoch)
                         VALUES (%s, 0, 0, 0, 0, %s);
                     """, (referenda_id, int(time.time())))
-                
+
                 # Check if the user has already voted
                 cursor.execute("SELECT vote_type FROM users WHERE user_id = %s AND thread_id = %s;", (str(user_id), str(referenda_id)))
                 previous_vote = cursor.fetchone()
@@ -58,7 +58,7 @@ class DatabaseHandler:
                 else:
                     # Increment new vote count
                     cursor.execute("UPDATE referenda_thread SET {} = {} + 1 WHERE thread_id = %s;".format(self.vote_options[vote_id], self.vote_options[vote_id]), (str(referenda_id),))
-                    
+
                     # Insert new user's vote
                     cursor.execute("INSERT INTO users (user_id, username, vote_type, thread_id) VALUES (%s, %s, %s, %s);", (str(user_id), username, vote_id, str(referenda_id)))
 
@@ -121,11 +121,11 @@ class DatabaseHandler:
 
     def migrate_data(self, json_file_path, archived):
         cursor = self.conn.cursor()
-        
+
         # Read JSON data from file
         with open(json_file_path, 'r') as f:
             json_data = json.load(f)
-        
+
         # Migrate data to PostgreSQL
         for thread_id, data in json_data.items():
             cursor.execute("""
@@ -135,7 +135,7 @@ class DatabaseHandler:
                 DO UPDATE SET aye=EXCLUDED.aye, nay=EXCLUDED.nay, recuse=EXCLUDED.recuse, epoch=EXCLUDED.epoch, archived=%s;
             """, (thread_id, data['aye'], data['nay'], data['recuse'], data['epoch'], archived, archived))
 
-            
+
             for user_id, user_data in data.get('users', {}).items():
                 # Debugging print
                 print(user_id, user_data.get('username'), user_data.get('vote_type'), thread_id)
@@ -154,7 +154,7 @@ class DatabaseHandler:
                     DO UPDATE SET username=EXCLUDED.username, vote_type=EXCLUDED.vote_type;
                 """, (user_id, user_data['username'], user_data['vote_type'], thread_id))
 
-        
+
         # Commit changes
         self.conn.commit()
 
@@ -166,5 +166,5 @@ class DatabaseHandler:
             # Migrate live and archived vote data
             self.migrate_data('../data/vote_counts.json', archived=False)
             self.migrate_data('../data/archived_votes.json', archived=True)
-            
-        
+
+

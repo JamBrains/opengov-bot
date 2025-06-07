@@ -2,7 +2,7 @@
 
 ![GitHub License](https://img.shields.io/github/license/JamBrains/opengov-bot)
 ![Supported](https://img.shields.io/badge/python-3.13.4%2B-blue)
-![GitHub commits since latest release](https://img.shields.io/github/commits-since/JamBrains/opengov-bot/latest)  
+![GitHub commits since latest release](https://img.shields.io/github/commits-since/JamBrains/opengov-bot/latest)
 
 ![alt text](./assets/jam-dao/logo_jam_dao.png)
 
@@ -32,6 +32,7 @@ Join the public rooms of the JAM DAO Discord server here: https://discord.gg/cJR
   - [Test Environment Usage](#test-environment-usage)
     - [Running Tests](#running-tests)
     - [Creating Your Own Tests](#creating-your-own-tests)
+- [Linting](#linting)
 - [Production Environment](#production-environment)
   - [Initial Setup](#initial-setup)
   - [Installing PM2 (Process Manager)](#installing-pm2-process-manager)
@@ -183,6 +184,37 @@ python -m unittest bot/test/ongoing_ref_call_data.py
 
 You can create your own unit tests in bot/test/unit and integration tests in bot/test/integration using the Discord test environment.
 
+## Linting
+
+This project uses linting tools to maintain code quality and consistency.
+
+### Code Style
+
+The project follows PEP 8 style guidelines for Python code. You can use tools like flake8 or pylint to check your code for style issues.
+
+### Whitespace Linting
+
+A custom whitespace linting tool is included to ensure consistent formatting:
+
+```bash
+# Check files for trailing whitespace and missing final newlines without modifying them
+python lint_whitespace.py --check
+
+# Fix trailing whitespace and ensure files end with newlines
+python lint_whitespace.py
+
+# Show detailed information about each processed file
+python lint_whitespace.py --verbose
+```
+
+The whitespace linter checks for:
+- Trailing whitespace at the end of lines
+- Missing newline at the end of files
+
+It processes files with these extensions: `.py`, `.md`, `.txt`, `.json`, `.yml`, `.yaml`, `.sh`, `.html`, `.css`, `.js`, `.ts`, `.jsx`, `.tsx`
+
+Directories like `.git`, `__pycache__`, `venv`, etc. are automatically ignored.
+
 ---
 
 ## Production Environment
@@ -193,13 +225,13 @@ You can create your own unit tests in bot/test/unit and integration tests in bot
 - [Organising with Categories](https://github.com/ChaosDAO-org/InternalGov-2.0/wiki/3.-Channel-Categories#adding-a-category)
 - [FAQ](https://github.com/ChaosDAO-org/InternalGov-2.0/wiki/99.-FAQ)
 
-  
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/SYnpgcgfDsA/0.jpg)](https://www.youtube.com/watch?v=SYnpgcgfDsA)
 
 ### Installing PM2 (Process Manager)
 
-> PM2 is a daemon process manager that will help you manage and keep your application/bot online 24/7  
-https://pm2.keymetrics.io/docs/usage/quick-start/  
+> PM2 is a daemon process manager that will help you manage and keep your application/bot online 24/7
+https://pm2.keymetrics.io/docs/usage/quick-start/
 
 Install PM2 globally:
 
@@ -255,10 +287,10 @@ docker cp .env internal-gov-2:/app/
 ## Features
 
 ### Autonomous Voting
-![alt text](https://i.imgur.com/5d0HJsY.png)  
+![alt text](https://i.imgur.com/5d0HJsY.png)
 
-When the bot votes is dictated by `/data/vote_periods`. Each origin of a proposal has its own setting on when the first vote should be made & second. A second vote will only be made if the result differs from the first vote. If the first vote is AYE and it remains AYE on the second period then no vote will be made on the network.  
-[Polkadot vote periods](/data/vote_periods/polkadot.json)  
+When the bot votes is dictated by `/data/vote_periods`. Each origin of a proposal has its own setting on when the first vote should be made & second. A second vote will only be made if the result differs from the first vote. If the first vote is AYE and it remains AYE on the second period then no vote will be made on the network.
+[Polkadot vote periods](/data/vote_periods/polkadot.json)
 [Kusama vote periods](/data/vote_periods/kusama.json)
 
 
@@ -313,7 +345,7 @@ When the bot votes is dictated by `/data/vote_periods`. Each origin of a proposa
 ---
 
 ## Support
-For assistance or inquiries, please refer to the following official channels of communication: 
+For assistance or inquiries, please refer to the following official channels of communication:
 
 ### JAM DAO
 
