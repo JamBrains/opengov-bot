@@ -686,11 +686,6 @@ async def participation_rate():
     """
     Periodically checks participation rate
 
-    This function runs every 24 hour to ensure that Discord threads linked to referendums
-    are updated with the latest information from the blockchain. It checks if new
-    referendum details, like vote tallies or preimage data, are available and updates
-    the embeds in the relevant Discord threads accordingly.
-
     Function workflow:
         - loads current members list from data/members.json
         - laods vote_counts from data/vote_counts.json
