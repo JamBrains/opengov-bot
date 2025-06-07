@@ -681,7 +681,6 @@ async def recheck_proposals():
         await substrate.close()
 
 @tasks.loop(hours=24)
-
 async def participation_rate():
     """
     Periodically checks participation rate
@@ -760,16 +759,16 @@ if __name__ == '__main__':
             for server in client.guilds:
                 await permission_checker.check_permissions(server, config.DISCORD_FORUM_CHANNEL_ID)
 
-            await task_handler.start_tasks([check_governance])
+            await task_handler.start_tasks([check_governance, participation_rate])
 
         except KeyboardInterrupt:
             logging.warning("KeyboardInterrupt caught, cleaning up...")
-            await task_handler.stop_tasks([check_governance, sync_embeds, autonomous_voting, recheck_proposals])
+            await task_handler.stop_tasks([check_governance, sync_embeds, autonomous_voting, recheck_proposals, participation_rate])
 
         except Exception as error:
             logging.error(f"An error occurred on on_ready(): {error}")
-            await task_handler.stop_tasks([check_governance, sync_embeds, autonomous_voting, recheck_proposals])
-            await task_handler.start_tasks([check_governance])
+            await task_handler.stop_tasks([check_governance, sync_embeds, autonomous_voting, recheck_proposals, participation_rate])
+            await task_handler.start_tasks([check_governance, participation_rate])
 
     # Slash command(s) available when solo mode is NOT enabled in the .env config
     # Commands:
