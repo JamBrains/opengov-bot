@@ -23,11 +23,11 @@ def calculate_current_participation_rate(votes, members):
         stats['participation_rate'] = (stats['votes'] / total_proposals * 100) if total_proposals > 0 else 0
     
     content = []
-    content.append("\nParticipation Statistics:")
+    content.append("Participation Statistics:")
     content.append(f"Total number of active proposals: {total_proposals}")
-    content.append("\nMember Participation:")
+    content.append("Member Participation:")
     
     for username, stats in sorted(members_votes.items(), key=lambda x: x[1]['votes'], reverse=True):
         content.append(f"{stats['display_name']} ({username}): {stats['votes']} votes out of {total_proposals} proposals ({stats['participation_rate']:.1f}%)")
     
-    return content
+    return "\n".join(content)
