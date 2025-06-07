@@ -292,9 +292,9 @@ async def run_default_scenario(env):
             channel_name="referendas",
             public_thread=public_post
         )
-        print("  SUCCESS: Feedback command executed successfully")
+        print("  ✅ SUCCESS: Feedback command executed successfully")
     except Exception as e:
-        print(f"  ERROR: {e}")
+        print(f"  ❌ ERROR: {e}")
 
     # Test feedback from a non-representative user (should fail)
     print("  3.2. Testing feedback from non-representative user (should fail)")
@@ -308,11 +308,11 @@ async def run_default_scenario(env):
             public_thread=public_post
         )
         if "don't have permission" in result["response_content"]:
-            print("  SUCCESS: Permission check worked correctly")
+            print("  ✅ SUCCESS: Permission check worked correctly")
         else:
-            print(f"  FAILED: Permission check failed - {result['response_content']}")
+            print(f"  ❌ FAILED: Permission check failed - {result['response_content']}")
     except Exception as e:
-        print(f"  ERROR: {e}")
+        print(f"  ❌ ERROR: {e}")
 
     # Test feedback in wrong channel (should fail)
     print("  3.3. Testing feedback in wrong channel (should fail)")
@@ -325,11 +325,11 @@ async def run_default_scenario(env):
             public_thread=public_post
         )
         if "must be used in a thread" in result["response_content"]:
-            print("  SUCCESS: Channel check worked correctly")
+            print("  ✅ SUCCESS: Channel check worked correctly")
         else:
-            print(f"  FAILED: Channel check failed - {result['response_content']}")
+            print(f"  ❌ FAILED: Channel check failed - {result['response_content']}")
     except Exception as e:
-        print(f"  ERROR: {e}")
+        print(f"  ❌ ERROR: {e}")
 
     # Check if the feedback was posted to the public-discussions channel
     print("  3.4. Checking if feedback was posted to public-discussions channel")
@@ -343,9 +343,9 @@ async def run_default_scenario(env):
     public_thread_messages = [msg.content for msg in public_post.messages]
     feedback_messages = [msg for msg in public_thread_messages if msg.startswith("**Feedback:**")]
     if feedback_messages:
-        print(f"  SUCCESS: Found feedback message: {feedback_messages[0][:50]}...")
+        print(f"  ✅ SUCCESS: Found feedback message: {feedback_messages[0][:50]}...")
     else:
-        print("  FAILED: No feedback message found in public-discussions thread")
+        print("  ❌ FAILED: No feedback message found in public-discussions thread")
 
     # Test discussions from different roles in the referendum thread
     print("\n4. Testing discussion permissions in referendum thread")
@@ -413,9 +413,9 @@ async def run_default_scenario(env):
             vote_content="!vote yes",
             author_name="participant1"
         )
-        print("  ERROR: Participant was able to vote when they shouldn't be allowed to!")
+        print("  ❌ ERROR: Participant was able to vote when they shouldn't be allowed to!")
     except PermissionError as e:
-        print(f"  SUCCESS: {e}")
+        print(f"  ✅ SUCCESS: {e}")
 
     # Test a non-representative (implementer) trying to vote (should fail)
     print("\n8. Testing permission restrictions - jam-implementer tries to vote (should fail)")
@@ -425,9 +425,9 @@ async def run_default_scenario(env):
             vote_content="!vote yes",
             author_name="implementer1"
         )
-        print("  ERROR: Implementer was able to vote when they shouldn't be allowed to!")
+        print("  ❌ ERROR: Implementer was able to vote when they shouldn't be allowed to!")
     except PermissionError as e:
-        print(f"  SUCCESS: {e}")
+        print(f"  ✅ SUCCESS: {e}")
 
     # Test a bot trying to vote (should fail)
     print("\n9. Testing permission restrictions - bots try to vote (should fail)")
@@ -438,9 +438,9 @@ async def run_default_scenario(env):
                 vote_content="!vote yes",
                 author_name=bot_name
             )
-            print(f"  FAILED: {bot_name} was able to vote when they should not have permission")
+            print(f"  ❌ FAILED: {bot_name} was able to vote when they should not have permission")
         except Exception as e:
-            print(f"  SUCCESS: {bot_name} - {str(e)}")
+            print(f"  ✅ SUCCESS: {bot_name} - {str(e)}")
 
     # Test the /vote slash command
     print("\n9.1. Testing /vote slash command")
@@ -466,9 +466,9 @@ async def run_default_scenario(env):
             thread_id=referendum.id,
             channel_name="referendas"
         )
-        print("  SUCCESS: dao_rep1 successfully used /vote slash command")
+        print("  ✅ SUCCESS: dao_rep1 successfully used /vote slash command")
     except Exception as e:
-        print(f"  ERROR: {e}")
+        print(f"  ❌ ERROR: {e}")
 
     print("  9.1.2. Testing /vote from non-representative user (should fail)")
     try:
@@ -487,11 +487,11 @@ async def run_default_scenario(env):
             channel_name="referendas"
         )
         if "don't have permission" in result["response_content"]:
-            print("  SUCCESS: Permission check worked correctly for /vote command")
+            print("  ✅ SUCCESS: Permission check worked correctly for /vote command")
         else:
-            print(f"  FAILED: Permission check failed - {result['response_content']}")
+            print(f"  ❌ FAILED: Permission check failed - {result['response_content']}")
     except Exception as e:
-        print(f"  ERROR: {e}")
+        print(f"  ❌ ERROR: {e}")
 
     # Add messages to the public discussion that was created earlier
     print("\n10. Adding messages to the public discussion thread")
