@@ -146,9 +146,22 @@ async def mock_feedback(interaction, message, config, client, public_thread=None
                 guild=existing_thread.guild
             )
 
+            # Make sure to add the message to the public thread
             existing_thread.messages.append(feedback_msg)
             print(f"DEBUG: Thread now has {len(existing_thread.messages)} messages after adding feedback")
             print(f"DEBUG: Last message content: {existing_thread.messages[-1].content}")
+
+            # Double check that the message was added correctly
+            for i, msg in enumerate(existing_thread.messages):
+                print(f"DEBUG: Message {i} in thread: {msg.content if hasattr(msg, 'content') else 'No content'}")
+
+            # Ensure the message is accessible via the public_thread parameter
+            if public_thread and public_thread.id == existing_thread.id:
+                print(f"DEBUG: Ensuring message is accessible via public_thread parameter")
+                if feedback_msg not in public_thread.messages:
+                    public_thread.messages.append(feedback_msg)
+                    print(f"DEBUG: Added feedback message to public_thread parameter")
+                    print(f"DEBUG: public_thread now has {len(public_thread.messages)} messages")
 
             # Confirm to the user that their feedback was posted
             interaction.followup.send(

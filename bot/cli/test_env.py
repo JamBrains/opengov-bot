@@ -282,11 +282,11 @@ async def run_default_scenario(env):
     print("\n3. Testing the /feedback slash command")
 
     # Test feedback from a dao-team-representative (should succeed)
-    print("  3.1. Testing feedback from dao-team-representative (should succeed)")
+    print("  3.1. Testing feedback from a dao-team-representative (should succeed)")
     try:
         await env.simulate_slash_command(
             command_name="feedback",
-            options={"message": "This is a test feedback message"},
+            options={"message": "I think this is a good proposal."},
             user_name="dao_rep1",
             thread_id=referendum.id,
             channel_name="referendas",
@@ -324,7 +324,7 @@ async def run_default_scenario(env):
             channel_name="general",
             public_thread=public_post
         )
-        if "must be used in a thread" in result["response_content"]:
+        if "This command can only be used in threads" in result["response_content"]:
             print("  ✅ SUCCESS: Channel check worked correctly")
         else:
             print(f"  ❌ FAILED: Channel check failed - {result['response_content']}")
