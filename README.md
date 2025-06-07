@@ -79,6 +79,8 @@ docker run -d \
   --restart always \
   internal-gov-2
 
+  docker run -d   --name internal-gov-2   -v ./data:/app/data   -v ./.env:/app/.env   --restart always   internal-gov-2
+
 # Copy .env file
 docker cp .env internal-gov-2:/app/
 ```
