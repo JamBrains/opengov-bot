@@ -126,7 +126,8 @@ class TestConfig:
         self.DISCORD_SUMMARIZER_CHANNEL_ID = 1000000000000000003  # summarizer channel
 
         # Role IDs
-        self.DISCORD_VOTER_ROLE = 1000000000000000004  # dao-team-representative role
+        self.DISCORD_VOTER_ROLE = 1000000000000000004
+        self.DISCORD_VOTER_ROLE_NAME = "dao-team-representative"  # dao-team-representative role
         self.DISCORD_ADMIN_ROLE = 1000000000000000005  # Admin role
 
         # Network configuration

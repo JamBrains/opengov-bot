@@ -1000,86 +1000,84 @@ if __name__ == '__main__':
                 ephemeral=True
             )
 
-    # Slash command(s) available when solo mode IS enabled in the .env config
+    # Slash command for voting on referenda
     # Commands:
     #   + /vote <referendum> <conviction> <decision>
-    if config.SOLO_MODE is True:
-        @client.tree.command(name='vote',
-                             description='This command works in or out of threads with an active vote and only when '
-                                         'SOLO_MODE is enabled.',
-                             guild=discord.Object(id=config.DISCORD_SERVER_ID))
-        @app_commands.choices(conviction=[app_commands.Choice(name='x0.1', value='None'),
-                                          app_commands.Choice(name='x1', value='Locked1x'),
-                                          app_commands.Choice(name='x2', value='Locked2x'),
-                                          app_commands.Choice(name='x3', value='Locked3x'),
-                                          app_commands.Choice(name='x4', value='Locked4x'),
-                                          app_commands.Choice(name='x5', value='Locked5x'),
-                                          app_commands.Choice(name='x6', value='Locked6x')],
-                              decision=[app_commands.Choice(name='AYE', value='aye'),
-                                        app_commands.Choice(name='NAY', value='nay'),
-                                        app_commands.Choice(name='ABSTAIN', value='abstain')])
-        async def vote(interaction: discord.Interaction, referendum: int, conviction: app_commands.Choice[str], decision: app_commands.Choice[str]):
+    @client.tree.command(name='vote',
+                         description='Vote on a referendum with specified conviction and decision.',
+                         guild=discord.Object(id=config.DISCORD_SERVER_ID))
+    @app_commands.choices(conviction=[app_commands.Choice(name='x0.1', value='None'),
+                                     app_commands.Choice(name='x1', value='Locked1x'),
+                                     app_commands.Choice(name='x2', value='Locked2x'),
+                                     app_commands.Choice(name='x3', value='Locked3x'),
+                                     app_commands.Choice(name='x4', value='Locked4x'),
+                                     app_commands.Choice(name='x5', value='Locked5x'),
+                                     app_commands.Choice(name='x6', value='Locked6x')],
+                         decision=[app_commands.Choice(name='AYE', value='aye'),
+                                   app_commands.Choice(name='NAY', value='nay'),
+                                   app_commands.Choice(name='ABSTAIN', value='abstain')])
+    async def vote(interaction: discord.Interaction, referendum: int, conviction: app_commands.Choice[str], decision: app_commands.Choice[str]):
 
-            user_id = interaction.user.id
+        user_id = interaction.user.id
 
-            member = await interaction.guild.fetch_member(user_id)
-            roles = member.roles
+        member = await interaction.guild.fetch_member(user_id)
+        roles = member.roles
 
-            sufficient_permissions = await client.check_permissions(interaction=interaction, required_role=config.DISCORD_ADMIN_ROLE, user_id=user_id, user_roles=roles)
-            if not sufficient_permissions:
+        sufficient_permissions = await client.check_permissions(interaction=interaction, required_role=config.DISCORD_ADMIN_ROLE, user_id=user_id, user_roles=roles)
+        if not sufficient_permissions:
+            return
+
+        try:
+            proxy_balance = await substrate.proxy_balance()
+            balance = await client.check_balance(interaction=interaction, proxy_balance=proxy_balance)
+            if not balance:
                 return
 
-            try:
-                proxy_balance = await substrate.proxy_balance()
-                balance = await client.check_balance(interaction=interaction, proxy_balance=proxy_balance)
-                if not balance:
-                    return
+            role = await client.create_or_get_role(interaction.guild, config.EXTRINSIC_ALERT)
+            await asyncio.sleep(0.5)
 
-                role = await client.create_or_get_role(interaction.guild, config.EXTRINSIC_ALERT)
-                await asyncio.sleep(0.5)
+            await interaction.followup.send("Initializing extrinsic, please wait...", ephemeral=True)
+            votes = [(int(referendum), decision.value, conviction.value)]
 
-                await interaction.followup.send("Initializing extrinsic, please wait...", ephemeral=True)
-                votes = [(int(referendum), decision.value, conviction.value)]
+            await asyncio.sleep(0.5)
+            indexes, calls, extrinsic_hash = await substrate.execute_multiple_votes(votes)
+            vote_scheme = EmbedVoteScheme(vote_type=decision.value)
 
-                await asyncio.sleep(0.5)
-                indexes, calls, extrinsic_hash = await substrate.execute_multiple_votes(votes)
-                vote_scheme = EmbedVoteScheme(vote_type=decision.value)
+            if extrinsic_hash is False:
+                await interaction.followup.send(content="Unable to execute vote, please make sure the referendum is live!", ephemeral=True)
+                return
 
-                if extrinsic_hash is False:
-                    await interaction.followup.send(content="Unable to execute vote, please make sure the referendum is live!", ephemeral=True)
-                    return
+            first_six = extrinsic_hash[:8]
+            last_six = extrinsic_hash[-8:]
+            short_extrinsic_hash = f"{first_six}...{last_six}"
 
-                first_six = extrinsic_hash[:8]
-                last_six = extrinsic_hash[-8:]
-                short_extrinsic_hash = f"{first_six}...{last_six}"
+            extrinsic_embed = Embed(color=vote_scheme.color, title=f'An on-chain vote has been cast',
+                                    description=f'{vote_scheme.emoji} {decision.value.upper()} on proposal **#{referendum}**', timestamp=datetime.now(timezone.utc))
+            extrinsic_embed.add_field(name='Extrinsic hash', value=f'[{short_extrinsic_hash}](https://{config.NETWORK_NAME}.subscan.io/extrinsic/{extrinsic_hash})', inline=True)
+            extrinsic_embed.add_field(name=f'Executed by', value=f'<@{interaction.user.id}>', inline=True)
+            extrinsic_embed.add_field(name='\u200b', value='\u200b', inline=False)
+            extrinsic_embed.add_field(name=f'Decision', value=f"{decision.value.upper()}", inline=True)
+            extrinsic_embed.add_field(name=f'Conviction', value=f"{conviction.value.upper()}", inline=True)
+            extrinsic_embed.set_footer(text="This vote was made using /vote")
 
-                extrinsic_embed = Embed(color=vote_scheme.color, title=f'An on-chain vote has been cast',
-                                        description=f'{vote_scheme.emoji} {decision.value.upper()} on proposal **#{referendum}**', timestamp=datetime.now(timezone.utc))
-                extrinsic_embed.add_field(name='Extrinsic hash', value=f'[{short_extrinsic_hash}](https://{config.NETWORK_NAME}.subscan.io/extrinsic/{extrinsic_hash})', inline=True)
-                extrinsic_embed.add_field(name=f'Executed by', value=f'<@{interaction.user.id}>', inline=True)
-                extrinsic_embed.add_field(name='\u200b', value='\u200b', inline=False)
-                extrinsic_embed.add_field(name=f'Decision', value=f"{decision.value.upper()}", inline=True)
-                extrinsic_embed.add_field(name=f'Conviction', value=f"{conviction.value.upper()}", inline=True)
-                extrinsic_embed.set_footer(text="This vote was made using /vote")
+            channel = client.get_channel(config.DISCORD_FORUM_CHANNEL_ID)
+            channel_thread = channel.get_thread(interaction.channel.id)
 
-                channel = client.get_channel(config.DISCORD_FORUM_CHANNEL_ID)
-                channel_thread = channel.get_thread(interaction.channel.id)
+            await asyncio.sleep(0.5)
+            extrinsic_receipt = await channel_thread.send(content=f'<@&{role.id}>', embed=extrinsic_embed)
+            await extrinsic_receipt.pin()
 
-                await asyncio.sleep(0.5)
-                extrinsic_receipt = await channel_thread.send(content=f'<@&{role.id}>', embed=extrinsic_embed)
-                await extrinsic_receipt.pin()
-
-                # Delete pinned notification
-                async for message in interaction.channel.history(limit=15, oldest_first=False):
-                    if message.type == discord.MessageType.pins_add:
-                        await message.delete()
-                await interaction.delete_original_response()
-            except Exception as error:
-                await interaction.delete_original_response()
-                await interaction.followup.send(content="An unexpected error occurred whilst running `/vote`", ephemeral=True)
-                logging.exception(f"An unexpected error occurred whilst running /vote: {error}")
-            finally:
-                await substrate.close()
+            # Delete pinned notification
+            async for message in interaction.channel.history(limit=15, oldest_first=False):
+                if message.type == discord.MessageType.pins_add:
+                    await message.delete()
+            await interaction.delete_original_response()
+        except Exception as error:
+            await interaction.delete_original_response()
+            await interaction.followup.send(content="An unexpected error occurred whilst running `/vote`", ephemeral=True)
+            logging.exception(f"An unexpected error occurred whilst running /vote: {error}")
+        finally:
+            await substrate.close()
 
     @client.tree.command(name='thread',
                          description='Disable the voting buttons to a thread',

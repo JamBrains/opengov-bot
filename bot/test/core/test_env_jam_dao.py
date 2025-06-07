@@ -232,6 +232,34 @@ class JamDaoDiscordTestEnvironment(DiscordTestEnvironment):
                 "response_content": interaction.followup.send.call_args[1]["content"] if interaction.followup.send.called else None,
                 "ephemeral": interaction.followup.send.call_args[1].get("ephemeral", False) if interaction.followup.send.called else None
             }
+        elif command_name == "vote":
+            if "referendum" not in options or "conviction" not in options or "decision" not in options:
+                raise ValueError("'referendum', 'conviction', and 'decision' options are required for vote command")
+
+            # Import our mock vote command
+            from bot.test.mocks.vote_command import mock_vote
+
+            # Get config from test fixtures
+            from bot.test.fixtures.config_jam_dao import TestConfig
+            config = TestConfig()
+
+            # Debug prints
+            print(f"DEBUG: Calling mock_vote with referendum: {options['referendum']}, conviction: {options['conviction']}, decision: {options['decision']}")
+
+            # Execute the mock vote command
+            await mock_vote(interaction, options["referendum"], options["conviction"], options["decision"], config, self.bot)
+
+            print("DEBUG: mock_vote completed")
+
+            # Return the results
+            return {
+                "command": command_name,
+                "user": user_name,
+                "options": options,
+                "response_sent": interaction.followup.send.called,
+                "response_content": interaction.followup.send.call_args[1]["content"] if interaction.followup.send.called else None,
+                "ephemeral": interaction.followup.send.call_args[1].get("ephemeral", False) if interaction.followup.send.called else None
+            }
         else:
             raise ValueError(f"Command {command_name} not implemented in test environment")
 

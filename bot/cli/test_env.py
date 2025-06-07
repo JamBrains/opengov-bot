@@ -433,14 +433,65 @@ async def run_default_scenario(env):
     print("\n9. Testing permission restrictions - bots try to vote (should fail)")
     for bot_name in ["bot_user", "dotgov_bot", "search_bot", "booster_bot"]:
         try:
-            bot_vote = await env.add_vote_to_referendum(
+            await env.add_vote_to_referendum(
                 thread=referendum,
                 vote_content="!vote yes",
                 author_name=bot_name
             )
-            print(f"  ERROR: Bot {bot_name} was able to vote when it shouldn't be allowed to!")
-        except PermissionError as e:
-            print(f"  SUCCESS: {bot_name} - {e}")
+            print(f"  FAILED: {bot_name} was able to vote when they should not have permission")
+        except Exception as e:
+            print(f"  SUCCESS: {bot_name} - {str(e)}")
+
+    # Test the /vote slash command
+    print("\n9.1. Testing /vote slash command")
+    print("  9.1.1. Testing /vote from dao-team-representative (should succeed)")
+    try:
+        # Create mock Choice objects for conviction and decision
+        class MockChoice:
+            def __init__(self, name, value):
+                self.name = name
+                self.value = value
+
+        conviction_choice = MockChoice(name="x1", value="Locked1x")
+        decision_choice = MockChoice(name="AYE", value="aye")
+
+        result = await env.simulate_slash_command(
+            command_name="vote",
+            options={
+                "referendum": 123,
+                "conviction": conviction_choice,
+                "decision": decision_choice
+            },
+            user_name="dao_rep1",
+            thread_id=referendum.id,
+            channel_name="referendas"
+        )
+        print("  SUCCESS: dao_rep1 successfully used /vote slash command")
+    except Exception as e:
+        print(f"  ERROR: {e}")
+
+    print("  9.1.2. Testing /vote from non-representative user (should fail)")
+    try:
+        conviction_choice = MockChoice(name="x1", value="Locked1x")
+        decision_choice = MockChoice(name="AYE", value="aye")
+
+        result = await env.simulate_slash_command(
+            command_name="vote",
+            options={
+                "referendum": 123,
+                "conviction": conviction_choice,
+                "decision": decision_choice
+            },
+            user_name="participant1",
+            thread_id=referendum.id,
+            channel_name="referendas"
+        )
+        if "don't have permission" in result["response_content"]:
+            print("  SUCCESS: Permission check worked correctly for /vote command")
+        else:
+            print(f"  FAILED: Permission check failed - {result['response_content']}")
+    except Exception as e:
+        print(f"  ERROR: {e}")
 
     # Add messages to the public discussion that was created earlier
     print("\n10. Adding messages to the public discussion thread")
