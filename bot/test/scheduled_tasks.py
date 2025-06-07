@@ -6,7 +6,6 @@ import asyncio
 import discord
 from discord.ext import commands, tasks
 from discord.ext.tasks import Loop
-from asyncio import coroutine
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -23,7 +22,7 @@ def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
-async def evaluate_task_schedule(self, task: Loop, minutes: int = 2) -> bool:
+async def evaluate_task_schedule(task: Loop, minutes: int = 2) -> bool:
     """
     Evaluates the given task and checks whether the task's next iteration is scheduled
     within a specific time gap. By default, this function checks if the next iteration of
@@ -49,11 +48,10 @@ async def evaluate_task_schedule(self, task: Loop, minutes: int = 2) -> bool:
 
         if time_difference <= minutes * 60:
             print(f"The tasks are scheduled within 20 minutes of each other. Time difference: {time_difference / 60:.2f} minutes.")
-            await self.stop_tasks([task])
+            await stop_tasks([task])
             return True
 
 
-@staticmethod
 async def stop_tasks(coroutine_task):
     """
     Stops specified asynchronous tasks if they are currently running.
@@ -70,7 +68,6 @@ async def stop_tasks(coroutine_task):
             print(f"Error stopping {task.get_task().get_name()} task: {e}")
 
 
-@staticmethod
 async def start_tasks(coroutine_task):
     """
     Restarts specified asynchronous tasks if they are not already running.
@@ -166,4 +163,6 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     await start_tasks([check_governance])
 
-bot.run(discord_token)
+# Don't run the bot when this module is imported for testing
+if __name__ == "__main__":
+    bot.run(discord_token)

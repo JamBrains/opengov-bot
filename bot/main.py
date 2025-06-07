@@ -2,6 +2,7 @@ import time
 import json
 import discord
 import asyncio
+import re
 from utils.config import Config
 from utils.logger import Logger
 from utils.gov2 import OpenGovernance2
@@ -696,7 +697,7 @@ async def participation_rate():
     try:
         await client.wait_until_ready()
         content = calculate_current_participation_rate(vote_counts, members)
-    
+
         # Writes content to discord
         channel = client.get_channel(config.DISCORD_SUMMARIZER_CHANNEL_ID)
         await channel.send(content=content)
@@ -707,6 +708,7 @@ async def participation_rate():
 @participation_rate.before_loop
 async def before_participation_rate():
     participation_rate.get_task().set_name('participation_rate')
+
 
 @check_governance.before_loop
 async def before_governance():
@@ -861,86 +863,221 @@ if __name__ == '__main__':
             finally:
                 await substrate.close()
 
-    # Slash command(s) available when solo mode IS enabled in the .env config
-    # Commands:
-    #   + /vote <referendum> <conviction> <decision>
-    if config.SOLO_MODE is True:
-        @client.tree.command(name='vote',
-                             description='This command works in or out of threads with an active vote and only when '
-                                         'SOLO_MODE is enabled.',
-                             guild=discord.Object(id=config.DISCORD_SERVER_ID))
-        @app_commands.choices(conviction=[app_commands.Choice(name='x0.1', value='None'),
-                                          app_commands.Choice(name='x1', value='Locked1x'),
-                                          app_commands.Choice(name='x2', value='Locked2x'),
-                                          app_commands.Choice(name='x3', value='Locked3x'),
-                                          app_commands.Choice(name='x4', value='Locked4x'),
-                                          app_commands.Choice(name='x5', value='Locked5x'),
-                                          app_commands.Choice(name='x6', value='Locked6x')],
-                              decision=[app_commands.Choice(name='AYE', value='aye'),
-                                        app_commands.Choice(name='NAY', value='nay'),
-                                        app_commands.Choice(name='ABSTAIN', value='abstain')])
-        async def vote(interaction: discord.Interaction, referendum: int, conviction: app_commands.Choice[str], decision: app_commands.Choice[str]):
+    # Add a new /feedback command that allows dao-team-representatives to provide anonymous feedback
+    # from threads in the referendas channel that will be posted to the public-discussions channel
+    @client.tree.command(name='feedback',
+                     description='Post anonymous feedback about this referendum to the public-discussions channel',
+                     guild=discord.Object(id=config.DISCORD_SERVER_ID))
+    async def feedback(interaction: discord.Interaction, message: str):
+        """
+        Post anonymous feedback about a referendum in the public-discussions channel from the referendas channel
 
-            user_id = interaction.user.id
+        Args:
+            interaction (discord.Interaction): The interaction object
+            message (str): The feedback message to post
+        """
+        # Defer the response to give us time to process
+        await interaction.response.defer(ephemeral=True)
 
-            member = await interaction.guild.fetch_member(user_id)
-            roles = member.roles
+        # Get the user's roles to check permissions
+        user_id = interaction.user.id
+        member = await interaction.guild.fetch_member(user_id)
+        roles = member.roles
 
-            sufficient_permissions = await client.check_permissions(interaction=interaction, required_role=config.DISCORD_ADMIN_ROLE, user_id=user_id, user_roles=roles)
-            if not sufficient_permissions:
+        # Check if the user has the dao-team-representative role
+        has_representative_role = False
+        for role in roles:
+            if role.name == "dao-team-representative" or role.name == "Admin":
+                has_representative_role = True
+                break
+
+        if not has_representative_role:
+            await interaction.followup.send(
+                "You don't have permission to use this command. Only users with the @dao-team-representative role can provide feedback.",
+                ephemeral=True
+            )
+            return
+
+        # Check if the command is being used in a thread in the referendas channel
+        channel = interaction.channel
+        if not isinstance(channel, discord.Thread) or not hasattr(channel, 'parent_id') or channel.parent_id != config.DISCORD_FORUM_CHANNEL_ID:
+            await interaction.followup.send(
+                "This command can only be used in threads within the #referendas channel.",
+                ephemeral=True
+            )
+            return
+
+        try:
+            # Extract the referendum number from the thread name
+            # Expected format: "123: Title" or "1234: Title" where the referendum number is the number before the colon
+            thread_name = channel.name
+            referendum_number = None
+
+            # Try to extract the referendum number from the referenda number in the thread name
+            match = re.search(r'^#?(\d+):', thread_name)
+            if match:
+                referendum_number = match.group(1)
+            else:
+                await interaction.followup.send(
+                    "Could not determine the referendum number from this thread's name.",
+                    ephemeral=True
+                )
                 return
 
-            try:
-                proxy_balance = await substrate.proxy_balance()
-                balance = await client.check_balance(interaction=interaction, proxy_balance=proxy_balance)
-                if not balance:
-                    return
+            # Get the public-discussions channel
+            public_channel = client.get_channel(config.DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID)
+            if not public_channel:
+                await interaction.followup.send(
+                    "Public-discussions channel not found. Please ask an administrator to set up the DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID.",
+                    ephemeral=True
+                )
+                return
 
-                role = await client.create_or_get_role(interaction.guild, config.EXTRINSIC_ALERT)
-                await asyncio.sleep(0.5)
+            # Look for an existing thread in public-discussions with the format 'Ref 1234:'
+            pattern = rf'^Ref\s+{re.escape(str(referendum_number))}:'
+            existing_thread = None
+            for thread in public_channel.threads:
+                if re.match(pattern, thread.name):
+                    existing_thread = thread
+                    break
 
-                await interaction.followup.send("Initializing extrinsic, please wait...", ephemeral=True)
-                votes = [(int(referendum), decision.value, conviction.value)]
+            # If no existing thread is found, create a new one
+            if not existing_thread:
+                # Create a new thread in the public-discussions channel
+                # For forum channels, we need to create a forum post first
+                if isinstance(public_channel, discord.ForumChannel):
+                    # Prepare the initial post content
+                    initial_content = f"This is the public discussion thread for Referendum #{referendum_number}. Team representatives can provide anonymous feedback here."
 
-                await asyncio.sleep(0.5)
-                indexes, calls, extrinsic_hash = await substrate.execute_multiple_votes(votes)
-                vote_scheme = EmbedVoteScheme(vote_type=decision.value)
+                    # Check if there are any available tags we should apply
+                    applied_tags = []
+                    if hasattr(public_channel, 'available_tags') and public_channel.available_tags:
+                        # Look for a 'Discussion' or 'Feedback' tag if available
+                        for tag in public_channel.available_tags:
+                            if tag.name.lower() in ['discussion', 'feedback', 'public']:
+                                applied_tags.append(tag)
+                                break
 
-                if extrinsic_hash is False:
-                    await interaction.followup.send(content="Unable to execute vote, please make sure the referendum is live!", ephemeral=True)
-                    return
+                    # Create a forum post which automatically creates a thread
+                    try:
+                        new_thread = await public_channel.create_thread(
+                            name=f"Ref {thread_name}",
+                            content=initial_content,
+                            applied_tags=applied_tags if applied_tags else None,
+                            auto_archive_duration=10080  # 7 days
+                        )
+                        # In discord.py, create_thread on a forum channel returns the thread directly
+                        existing_thread = new_thread
+                    except Exception as e:
+                        logging.error(f"Error creating forum thread: {e}")
+                        await interaction.followup.send(
+                            "Error creating thread in public-discussions channel. Please contact an administrator.",
+                            ephemeral=True
+                        )
+                        return
+                else:
+                    # For text channels, create a thread directly
+                    initial_message = await public_channel.send(f"Ref {thread_name}")
+                    new_thread = await initial_message.create_thread(
+                        name=f"Ref {thread_name}",
+                        auto_archive_duration=10080  # 7 days
+                    )
+                    existing_thread = new_thread
 
-                first_six = extrinsic_hash[:8]
-                last_six = extrinsic_hash[-8:]
-                short_extrinsic_hash = f"{first_six}...{last_six}"
+            # Post the feedback message to the thread
+            await existing_thread.send(f"**Feedback:** {message}")
 
-                extrinsic_embed = Embed(color=vote_scheme.color, title=f'An on-chain vote has been cast',
-                                        description=f'{vote_scheme.emoji} {decision.value.upper()} on proposal **#{referendum}**', timestamp=datetime.now(timezone.utc))
-                extrinsic_embed.add_field(name='Extrinsic hash', value=f'[{short_extrinsic_hash}](https://{config.NETWORK_NAME}.subscan.io/extrinsic/{extrinsic_hash})', inline=True)
-                extrinsic_embed.add_field(name=f'Executed by', value=f'<@{interaction.user.id}>', inline=True)
-                extrinsic_embed.add_field(name='\u200b', value='\u200b', inline=False)
-                extrinsic_embed.add_field(name=f'Decision', value=f"{decision.value.upper()}", inline=True)
-                extrinsic_embed.add_field(name=f'Conviction', value=f"{conviction.value.upper()}", inline=True)
-                extrinsic_embed.set_footer(text="This vote was made using /vote")
+            # Confirm to the user that their feedback was posted
+            await interaction.followup.send(
+                f"Your feedback has been anonymously posted to the public-discussions channel.",
+                ephemeral=True
+            )
 
-                channel = client.get_channel(config.DISCORD_FORUM_CHANNEL_ID)
-                channel_thread = channel.get_thread(interaction.channel.id)
+        except Exception as error:
+            logging.exception(f"An error occurred while processing feedback: {error}")
+            await interaction.followup.send(
+                "An error occurred while processing your feedback. Please try again later.",
+                ephemeral=True
+            )
 
-                await asyncio.sleep(0.5)
-                extrinsic_receipt = await channel_thread.send(content=f'<@&{role.id}>', embed=extrinsic_embed)
-                await extrinsic_receipt.pin()
+    # Slash command for voting on referenda
+    # Commands:
+    #   + /vote <referendum> <conviction> <decision>
+    @client.tree.command(name='vote',
+                         description='Vote on a referendum with specified conviction and decision.',
+                         guild=discord.Object(id=config.DISCORD_SERVER_ID))
+    @app_commands.choices(conviction=[app_commands.Choice(name='x0.1', value='None'),
+                                     app_commands.Choice(name='x1', value='Locked1x'),
+                                     app_commands.Choice(name='x2', value='Locked2x'),
+                                     app_commands.Choice(name='x3', value='Locked3x'),
+                                     app_commands.Choice(name='x4', value='Locked4x'),
+                                     app_commands.Choice(name='x5', value='Locked5x'),
+                                     app_commands.Choice(name='x6', value='Locked6x')],
+                         decision=[app_commands.Choice(name='AYE', value='aye'),
+                                   app_commands.Choice(name='NAY', value='nay'),
+                                   app_commands.Choice(name='ABSTAIN', value='abstain')])
+    async def vote(interaction: discord.Interaction, referendum: int, conviction: app_commands.Choice[str], decision: app_commands.Choice[str]):
 
-                # Delete pinned notification
-                async for message in interaction.channel.history(limit=15, oldest_first=False):
-                    if message.type == discord.MessageType.pins_add:
-                        await message.delete()
-                await interaction.delete_original_response()
-            except Exception as error:
-                await interaction.delete_original_response()
-                await interaction.followup.send(content="An unexpected error occurred whilst running `/vote`", ephemeral=True)
-                logging.exception(f"An unexpected error occurred whilst running /vote: {error}")
-            finally:
-                await substrate.close()
+        user_id = interaction.user.id
+
+        member = await interaction.guild.fetch_member(user_id)
+        roles = member.roles
+
+        sufficient_permissions = await client.check_permissions(interaction=interaction, required_role=config.DISCORD_ADMIN_ROLE, user_id=user_id, user_roles=roles)
+        if not sufficient_permissions:
+            return
+
+        try:
+            proxy_balance = await substrate.proxy_balance()
+            balance = await client.check_balance(interaction=interaction, proxy_balance=proxy_balance)
+            if not balance:
+                return
+
+            role = await client.create_or_get_role(interaction.guild, config.EXTRINSIC_ALERT)
+            await asyncio.sleep(0.5)
+
+            await interaction.followup.send("Initializing extrinsic, please wait...", ephemeral=True)
+            votes = [(int(referendum), decision.value, conviction.value)]
+
+            await asyncio.sleep(0.5)
+            indexes, calls, extrinsic_hash = await substrate.execute_multiple_votes(votes)
+            vote_scheme = EmbedVoteScheme(vote_type=decision.value)
+
+            if extrinsic_hash is False:
+                await interaction.followup.send(content="Unable to execute vote, please make sure the referendum is live!", ephemeral=True)
+                return
+
+            first_six = extrinsic_hash[:8]
+            last_six = extrinsic_hash[-8:]
+            short_extrinsic_hash = f"{first_six}...{last_six}"
+
+            extrinsic_embed = Embed(color=vote_scheme.color, title=f'An on-chain vote has been cast',
+                                    description=f'{vote_scheme.emoji} {decision.value.upper()} on proposal **#{referendum}**', timestamp=datetime.now(timezone.utc))
+            extrinsic_embed.add_field(name='Extrinsic hash', value=f'[{short_extrinsic_hash}](https://{config.NETWORK_NAME}.subscan.io/extrinsic/{extrinsic_hash})', inline=True)
+            extrinsic_embed.add_field(name=f'Executed by', value=f'<@{interaction.user.id}>', inline=True)
+            extrinsic_embed.add_field(name='\u200b', value='\u200b', inline=False)
+            extrinsic_embed.add_field(name=f'Decision', value=f"{decision.value.upper()}", inline=True)
+            extrinsic_embed.add_field(name=f'Conviction', value=f"{conviction.value.upper()}", inline=True)
+            extrinsic_embed.set_footer(text="This vote was made using /vote")
+
+            channel = client.get_channel(config.DISCORD_FORUM_CHANNEL_ID)
+            channel_thread = channel.get_thread(interaction.channel.id)
+
+            await asyncio.sleep(0.5)
+            extrinsic_receipt = await channel_thread.send(content=f'<@&{role.id}>', embed=extrinsic_embed)
+            await extrinsic_receipt.pin()
+
+            # Delete pinned notification
+            async for message in interaction.channel.history(limit=15, oldest_first=False):
+                if message.type == discord.MessageType.pins_add:
+                    await message.delete()
+            await interaction.delete_original_response()
+        except Exception as error:
+            await interaction.delete_original_response()
+            await interaction.followup.send(content="An unexpected error occurred whilst running `/vote`", ephemeral=True)
+            logging.exception(f"An unexpected error occurred whilst running /vote: {error}")
+        finally:
+            await substrate.close()
 
     @client.tree.command(name='thread',
                          description='Disable the voting buttons to a thread',

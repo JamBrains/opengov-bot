@@ -1,9 +1,8 @@
 from dotenv import load_dotenv
 from utils.logger import Logger
-from distutils.util import strtobool
+from utils.string_utils import strtobool
 import os
 import json
-
 
 class Config:
     def __init__(self):
@@ -15,6 +14,7 @@ class Config:
             self.DISCORD_API_KEY = os.getenv('DISCORD_API_KEY') or self.raise_error("Missing DISCORD_API_KEY")
             self.DISCORD_SERVER_ID = int(os.getenv('DISCORD_SERVER_ID') or self.raise_error("Missing DISCORD_SERVER_ID"))
             self.DISCORD_FORUM_CHANNEL_ID = int(os.getenv('DISCORD_FORUM_CHANNEL_ID') or self.raise_error("Missing DISCORD_FORUM_CHANNEL_ID"))
+            self.DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID = int(os.getenv('DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID') or 0) # ID for public-discussions channel
             self.DISCORD_SUMMARIZER_CHANNEL_ID = int(os.getenv('DISCORD_SUMMARIZER_CHANNEL_ID')) or None
             self.DISCORD_SUMMARY_ROLE = os.getenv('DISCORD_SUMMARY_ROLE') or None
             self.DISCORD_ADMIN_ROLE = os.getenv('DISCORD_ADMIN_ROLE') or self.raise_error("Missing DISCORD_ADMIN_ROLE")

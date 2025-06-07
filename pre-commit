@@ -1,0 +1,38 @@
+#!/bin/bash
+# Pre-commit hook to run tests before allowing a commit
+
+# Exit on error
+set -e
+
+echo "Running pre-commit hook..."
+
+# Check discord.py version
+echo "Checking discord.py version..."
+python -m bot.test.check_discord_version
+
+# Store the current directory
+CURRENT_DIR=$(pwd)
+echo "Running JAM DAO Discord bot tests..."
+
+# Run all tests using the test runner
+echo "Running all tests..."
+python -m bot.test.run_tests
+
+# Check if the tests passed
+if [ $? -ne 0 ]; then
+    echo "Tests failed! Commit aborted."
+    exit 1
+fi
+
+# Run the example test environment
+echo "Running test environment..."
+python -m bot.test.run_test_environment
+
+# Check if the test environment ran successfully
+if [ $? -ne 0 ]; then
+    echo "Test environment failed! Commit aborted."
+    exit 1
+fi
+
+echo "All tests passed! Proceeding with commit."
+exit 0

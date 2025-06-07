@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""
+Command-line interface entry point for JAM DAO Discord Bot.
+"""
+
+import sys
+import os
+
+# Add the project root to the path so we can import our modules
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, project_root)
+
+from bot.run import main
+
+if __name__ == "__main__":
+    sys.exit(main())
