@@ -92,27 +92,49 @@ def handle_test_command(args):
     # Track overall success
     success = True
 
+    # Track test runs
+    test_runs = []
+
     # Run the specified tests
     if args.unit or args.all:
-        if not run_unit_tests(quiet=args.quiet, timeout=args.timeout):
+        unit_success = run_unit_tests(quiet=args.quiet, timeout=args.timeout)
+        test_runs.append(("Unit Tests", unit_success))
+        if not unit_success:
             success = False
 
     if args.integration or args.all:
-        if not run_integration_tests(quiet=args.quiet, timeout=args.timeout):
+        integration_success = run_integration_tests(quiet=args.quiet, timeout=args.timeout)
+        test_runs.append(("Integration Tests", integration_success))
+        if not integration_success:
             success = False
 
     if args.scheduled_tasks or args.api or args.all:
-        if not run_scheduled_tasks_tests(quiet=args.quiet, timeout=args.timeout):
+        scheduled_tasks_success = run_scheduled_tasks_tests(quiet=args.quiet, timeout=args.timeout)
+        test_runs.append(("Scheduled Tasks Tests", scheduled_tasks_success))
+        if not scheduled_tasks_success:
             success = False
 
     if args.ongoing_ref or args.api or args.all:
-        if not run_ongoing_ref_tests(quiet=args.quiet, timeout=args.timeout):
+        ongoing_ref_success = run_ongoing_ref_tests(quiet=args.quiet, timeout=args.timeout)
+        test_runs.append(("Ongoing Ref Tests", ongoing_ref_success))
+        if not ongoing_ref_success:
             success = False
 
     # If no specific tests were specified, run unit tests by default
     if not (args.unit or args.integration or args.api or args.scheduled_tasks or args.ongoing_ref or args.all):
-        if not run_unit_tests(quiet=args.quiet, timeout=args.timeout):
+        unit_success = run_unit_tests(quiet=args.quiet, timeout=args.timeout)
+        test_runs.append(("Unit Tests", unit_success))
+        if not unit_success:
             success = False
+
+    # Print summary with emoji indicators
+    print("\n" + "-" * 40)
+    print("📋 Test Summary:")
+    for test_name, test_success in test_runs:
+        emoji = "✅" if test_success else "❌"
+        print(f"{emoji} {test_name}: {'PASSED' if test_success else 'FAILED'}")
+    print("-" * 40)
+    print(f"{'✅ All tests passed!' if success else '❌ Some tests failed!'}")
 
     return 0 if success else 1
 

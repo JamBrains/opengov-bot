@@ -78,13 +78,13 @@ async def mock_vote(interaction, referendum, conviction, decision, config, clien
 
         # Determine color based on decision
         color = 0x00FF00  # Green for AYE
-        emoji = "✅"
+        emoji = "👍"
         if decision.value == "nay":
             color = 0xFF0000  # Red for NAY
-            emoji = "❌"
+            emoji = "👎"
         elif decision.value == "abstain":
             color = 0xFFFF00  # Yellow for ABSTAIN
-            emoji = "⚠️"
+            emoji = "🤷"
 
         # Create embed for vote confirmation
         extrinsic_embed = Embed(

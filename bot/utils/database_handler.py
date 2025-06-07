@@ -142,7 +142,7 @@ class DatabaseHandler:
 
                 # Check for None values
                 if None in [user_id, user_data.get('username'), user_data.get('vote_type'), thread_id]:
-                    print("Skipping due to None value")
+                    print("⏭️  Skipping due to None value")
                     continue
 
                 cursor.execute("""

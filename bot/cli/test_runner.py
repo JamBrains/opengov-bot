@@ -13,10 +13,91 @@ import time
 import contextlib
 import types
 from unittest.mock import patch, MagicMock
+from unittest.runner import TextTestResult
+from unittest.runner import TextTestRunner
 
 # Add the project root to the path so we can import our modules
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
+
+
+class EmojiTestResult(TextTestResult):
+    """Custom test result class that uses emojis for pass/fail indicators."""
+
+    def addSuccess(self, test):
+        super(TextTestResult, self).addSuccess(test)
+        if self.showAll:
+            self.stream.writeln("✅ OK")
+        elif self.dots:
+            self.stream.write('✅')
+            self.stream.flush()
+
+    def addError(self, test, err):
+        super(TextTestResult, self).addError(test, err)
+        if self.showAll:
+            self.stream.writeln("❌ ERROR")
+        elif self.dots:
+            self.stream.write('❌')
+            self.stream.flush()
+
+    def addFailure(self, test, err):
+        super(TextTestResult, self).addFailure(test, err)
+        if self.showAll:
+            self.stream.writeln("❌ FAIL")
+        elif self.dots:
+            self.stream.write('❌')
+            self.stream.flush()
+
+    def addSkip(self, test, reason):
+        super(TextTestResult, self).addSkip(test, reason)
+        if self.showAll:
+            self.stream.writeln("⏭️  SKIP")
+        elif self.dots:
+            self.stream.write('⏭️')
+            self.stream.flush()
+
+    def addExpectedFailure(self, test, err):
+        super(TextTestResult, self).addExpectedFailure(test, err)
+        if self.showAll:
+            self.stream.writeln("✅ EXPECTED FAIL")
+        elif self.dots:
+            self.stream.write('✅')
+            self.stream.flush()
+
+    def addUnexpectedSuccess(self, test):
+        super(TextTestResult, self).addUnexpectedSuccess(test)
+        if self.showAll:
+            self.stream.writeln("❌ UNEXPECTED SUCCESS")
+        elif self.dots:
+            self.stream.write('❌')
+            self.stream.flush()
+
+    def printErrors(self):
+        """Override to add emoji indicators to error summary."""
+        super(EmojiTestResult, self).printErrors()
+
+    def printTotal(self, run, errors, failures):
+        """Print the summary with emoji indicators."""
+        if run == 0:
+            self.stream.writeln("No tests run")
+        else:
+            self.stream.writeln(self.separator2)
+            if errors or failures:
+                self.stream.writeln(f"❌ FAILED (failures={failures}, errors={errors})")
+            else:
+                self.stream.writeln(f"✅ SUCCESS ({run} tests passed)")
+
+    def wasSuccessful(self):
+        """Return True if all tests passed."""
+        result = super(EmojiTestResult, self).wasSuccessful()
+        return result
+
+
+class EmojiTestRunner(TextTestRunner):
+    """Custom test runner that uses the EmojiTestResult class."""
+
+    def _makeResult(self):
+        return EmojiTestResult(self.stream, self.descriptions, self.verbosity)
 
 
 def setup_discord_mocks():
@@ -171,7 +252,7 @@ def run_unit_tests(quiet=False, timeout=60):
     Returns:
         bool: True if all tests passed, False otherwise
     """
-    print("Running unit tests...")
+    print("🧪 Running unit tests...")
 
     # Discover and run unit tests
     loader = unittest.TestLoader()
@@ -181,7 +262,7 @@ def run_unit_tests(quiet=False, timeout=60):
     try:
         with test_timeout(timeout):
             with suppress_stdout_stderr(suppress=quiet):
-                runner = unittest.TextTestRunner(verbosity=2)
+                runner = EmojiTestRunner(verbosity=2)
                 result = runner.run(suite)
 
         return result.wasSuccessful()
@@ -200,7 +281,7 @@ def run_integration_tests(quiet=False, timeout=60):
     Returns:
         bool: True if all tests passed, False otherwise
     """
-    print("Running integration tests...")
+    print("🔄 Running integration tests...")
 
     # Discover and run integration tests
     loader = unittest.TestLoader()
@@ -210,7 +291,7 @@ def run_integration_tests(quiet=False, timeout=60):
     try:
         with test_timeout(timeout):
             with suppress_stdout_stderr(suppress=quiet):
-                runner = unittest.TextTestRunner(verbosity=2)
+                runner = EmojiTestRunner(verbosity=2)
                 result = runner.run(suite)
 
         return result.wasSuccessful()
@@ -229,7 +310,7 @@ def run_scheduled_tasks_tests(quiet=False, timeout=60):
     Returns:
         bool: True if all tests passed, False otherwise
     """
-    print("Running scheduled_tasks.py tests...")
+    print("⏱️ Running scheduled_tasks.py tests...")
 
     # Check if we should use real API or mocks
     use_real_api = os.getenv('USE_REAL_APIS', 'false').lower() == 'true'
@@ -249,7 +330,7 @@ def run_scheduled_tasks_tests(quiet=False, timeout=60):
         with test_timeout(timeout):
             # Run the tests with output suppression if quiet mode is enabled
             with suppress_stdout_stderr(suppress=quiet):
-                runner = unittest.TextTestRunner(verbosity=2)
+                runner = EmojiTestRunner(verbosity=2)
                 result = runner.run(suite)
 
         return result.wasSuccessful()
@@ -273,7 +354,7 @@ def run_ongoing_ref_tests(quiet=False, timeout=60):
     Returns:
         bool: True if all tests passed, False otherwise
     """
-    print("Running ongoing_ref_call_data.py tests...")
+    print("📊 Running ongoing_ref_call_data.py tests...")
 
     # Check if we should use real API or mocks
     use_real_api = os.getenv('USE_REAL_APIS', 'false').lower() == 'true'
@@ -310,7 +391,7 @@ def run_ongoing_ref_tests(quiet=False, timeout=60):
         with test_timeout(timeout):
             # Run the tests with output suppression if quiet mode is enabled
             with suppress_stdout_stderr(suppress=quiet):
-                runner = unittest.TextTestRunner(verbosity=2)
+                runner = EmojiTestRunner(verbosity=2)
                 result = runner.run(suite)
 
         return result.wasSuccessful()

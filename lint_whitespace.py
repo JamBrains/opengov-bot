@@ -158,11 +158,11 @@ def remove_trailing_whitespace(file_path, check_only=False, verbose=False):
                 with open(file_path, 'w', encoding='utf-8') as f:
                     f.writelines(cleaned_lines)
                 if verbose:
-                    print(f"✓ {file_path}: Trailing whitespace removed")
+                    print(f"✅ {file_path}: Trailing whitespace removed")
                 return True
         else:
             if verbose:
-                print(f"✓ {file_path}: No trailing whitespace found")
+                print(f"✅ {file_path}: No trailing whitespace found")
             return True
 
     except Exception as e:
@@ -190,7 +190,7 @@ def process_specific_paths(paths, check_only=False, verbose=False):
             else:
                 skipped_count += 1
                 if verbose:
-                    print(f"Skipping {path}")
+                    print(f"⏭️  Skipping {path}")
         elif os.path.isdir(path):
             # Process a directory
             if verbose:
@@ -211,7 +211,7 @@ def process_specific_paths(paths, check_only=False, verbose=False):
                     else:
                         skipped_count += 1
                         if verbose:
-                            print(f"Skipping {file_path}")
+                            print(f"⏭️  Skipping {file_path}")
         else:
             print(f"Warning: Path not found: {path}")
             skipped_count += 1
@@ -240,7 +240,7 @@ def process_directory(directory='.', check_only=False, verbose=False):
             else:
                 skipped_count += 1
                 if verbose:
-                    print(f"Skipping {file_path}")
+                    print(f"⏭️  Skipping {file_path}")
 
     return success_count, failure_count, skipped_count
 
