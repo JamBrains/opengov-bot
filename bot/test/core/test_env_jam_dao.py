@@ -152,6 +152,89 @@ class JamDaoDiscordTestEnvironment(DiscordTestEnvironment):
 
         return (votes_count / len(eligible_users)) * 100.0
 
+    async def simulate_slash_command(self, command_name, options=None, user_name=None, thread_id=None, channel_name=None, public_thread=None):
+        """
+        Simulate a slash command execution in the test environment.
+
+        Args:
+            command_name (str): The name of the slash command to simulate
+            options (dict): Dictionary of command options/arguments
+            user_name (str): The name of the user executing the command
+            channel_name (str, optional): The name of the channel where the command is executed
+            thread_id (int, optional): The ID of the thread if the command is executed in a thread
+
+        Returns:
+            dict: The result of the command execution
+        """
+        from bot.test.mocks.interaction import MockInteraction
+
+        # Get the user
+        user = self.users.get(user_name)
+        if not user:
+            raise ValueError(f"User {user_name} not found")
+
+        # Get the channel or thread
+        channel = None
+        if thread_id is not None:
+            # Find the thread by ID
+            for forum_channel in self.forum_channels.values():
+                for thread in forum_channel.threads:
+                    if thread.id == thread_id:
+                        channel = thread
+                        break
+                if channel:
+                    break
+            if not channel:
+                raise ValueError(f"Thread with ID {thread_id} not found")
+        elif channel_name:
+            # Get the channel by name
+            if channel_name in self.channels:
+                channel = self.channels[channel_name]
+            elif channel_name in self.forum_channels:
+                channel = self.forum_channels[channel_name]
+            else:
+                raise ValueError(f"Channel {channel_name} not found")
+
+        # Create the interaction object
+        interaction = MockInteraction(user, self.guild, channel)
+
+        # Set up command data
+        interaction.data = {"name": command_name}
+        interaction.options = options
+
+        # Execute the command
+        if command_name == "feedback":
+            if "message" not in options:
+                raise ValueError("'message' option is required for feedback command")
+
+            # Import our mock feedback command
+            from bot.test.mocks.feedback_command import mock_feedback
+
+            # Get config from test fixtures
+            from bot.test.fixtures.config_jam_dao import TestConfig
+            config = TestConfig()
+
+            # Debug prints
+            print(f"DEBUG: Calling mock_feedback with message: {options['message']}")
+            print(f"DEBUG: public_thread: {public_thread.name if public_thread else 'None'}")
+
+            # Execute the mock feedback command
+            await mock_feedback(interaction, options["message"], config, self.bot, public_thread)
+
+            print("DEBUG: mock_feedback completed")
+
+            # Return the results
+            return {
+                "command": command_name,
+                "user": user_name,
+                "options": options,
+                "response_sent": interaction.followup.send.called,
+                "response_content": interaction.followup.send.call_args[1]["content"] if interaction.followup.send.called else None,
+                "ephemeral": interaction.followup.send.call_args[1].get("ephemeral", False) if interaction.followup.send.called else None
+            }
+        else:
+            raise ValueError(f"Command {command_name} not implemented in test environment")
+
     async def add_message_to_thread(self, thread=None, content=None, author_name=None, thread_id=None, forum_name=None):
         """
         Add a message to a thread. This overrides the parent method to handle both direct thread objects

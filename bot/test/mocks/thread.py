@@ -28,6 +28,7 @@ class MockThread:
         self.id = id
         self.name = name
         self.parent = parent
+        self.parent_id = parent.id if parent else None
         self.owner = owner
         self.guild = guild or parent.guild
         self.messages = []

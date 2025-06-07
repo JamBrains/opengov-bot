@@ -112,3 +112,23 @@ def get_forum_channels():
 def get_users():
     """Return users configuration."""
     return USERS
+
+
+class TestConfig:
+    """Test configuration for JAM DAO Discord bot."""
+
+    def __init__(self):
+        """Initialize test configuration."""
+        # Channel IDs
+        self.DISCORD_SERVER_ID = 1000000000000000000
+        self.DISCORD_FORUM_CHANNEL_ID = 1000000000000000001  # referendas channel
+        self.DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID = 1000000000000000002  # public-discussions channel
+        self.DISCORD_SUMMARIZER_CHANNEL_ID = 1000000000000000003  # summarizer channel
+
+        # Role IDs
+        self.DISCORD_VOTER_ROLE = 1000000000000000004  # dao-team-representative role
+        self.DISCORD_ADMIN_ROLE = 1000000000000000005  # Admin role
+
+        # Network configuration
+        self.NETWORK_NAME = "polkadot"
+        self.SOLO_MODE = False

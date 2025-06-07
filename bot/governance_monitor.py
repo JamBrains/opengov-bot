@@ -280,7 +280,7 @@ class GovernanceMonitor(discord.Client):
                 return json.loads(data)
         except FileNotFoundError:
             return {}
-    
+
     @staticmethod
     async def load_voting_members():
         try:
@@ -868,4 +868,4 @@ class GovernanceMonitor(discord.Client):
 #       # This copies the global commands over to your guild.
 #       self.tree.copy_global_to(guild=self.guild)
 #       await self.tree.sync(guild=self.guild)
-        
+

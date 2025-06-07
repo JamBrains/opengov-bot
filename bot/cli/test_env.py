@@ -257,7 +257,7 @@ async def run_default_scenario(env):
     # Create a referendum post in the referendas forum
     print("\n1. Creating a new referendum in the referendas forum")
     referendum = await env.create_forum_post(
-        title="Referendum #123: Treasury Spend for Development",
+        title="123: Treasury Spend for Development",
         content="This referendum proposes to spend 100 DOT on development work.",
         forum_name="referendas",
         author_name="dao_rep1",
@@ -271,20 +271,89 @@ async def run_default_scenario(env):
     # Create a public discussion post
     print("\n2. Creating a public discussion thread for the referendum")
     public_post = await env.create_forum_post(
-        title="Public Discussion: Referendum #123",
-        content="This is the public discussion thread for Referendum #123 about treasury spending.",
+        title="Ref 123: Treasury Spend for Development",
+        content="This is the public discussion thread for Referendum #123.",
         forum_name="public-discussions",
         author_name="dao_rep1"
     )
     print(f"Created public discussion post: {public_post.name}")
 
+    # Test the feedback command
+    print("\n3. Testing the /feedback slash command")
+
+    # Test feedback from a dao-team-representative (should succeed)
+    print("  3.1. Testing feedback from dao-team-representative (should succeed)")
+    try:
+        await env.simulate_slash_command(
+            command_name="feedback",
+            options={"message": "This is a test feedback message"},
+            user_name="dao_rep1",
+            thread_id=referendum.id,
+            channel_name="referendas",
+            public_thread=public_post
+        )
+        print("  SUCCESS: Feedback command executed successfully")
+    except Exception as e:
+        print(f"  ERROR: {e}")
+
+    # Test feedback from a non-representative user (should fail)
+    print("  3.2. Testing feedback from non-representative user (should fail)")
+    try:
+        result = await env.simulate_slash_command(
+            command_name="feedback",
+            options={"message": "I think this is a good proposal."},
+            user_name="participant1",
+            thread_id=referendum.id,
+            channel_name="referendas",
+            public_thread=public_post
+        )
+        if "don't have permission" in result["response_content"]:
+            print("  SUCCESS: Permission check worked correctly")
+        else:
+            print(f"  FAILED: Permission check failed - {result['response_content']}")
+    except Exception as e:
+        print(f"  ERROR: {e}")
+
+    # Test feedback in wrong channel (should fail)
+    print("  3.3. Testing feedback in wrong channel (should fail)")
+    try:
+        result = await env.simulate_slash_command(
+            command_name="feedback",
+            options={"message": "This is feedback in the wrong channel."},
+            user_name="dao_rep1",
+            channel_name="general",
+            public_thread=public_post
+        )
+        if "must be used in a thread" in result["response_content"]:
+            print("  SUCCESS: Channel check worked correctly")
+        else:
+            print(f"  FAILED: Channel check failed - {result['response_content']}")
+    except Exception as e:
+        print(f"  ERROR: {e}")
+
+    # Check if the feedback was posted to the public-discussions channel
+    print("  3.4. Checking if feedback was posted to public-discussions channel")
+    # Debug prints
+    print(f"  DEBUG: public_post.name = {public_post.name}")
+    print(f"  DEBUG: public_post.id = {public_post.id}")
+    print(f"  DEBUG: Number of messages in public_post = {len(public_post.messages)}")
+    for i, msg in enumerate(public_post.messages):
+        print(f"  DEBUG: Message {i}: {msg.__class__.__name__}, content = {msg.content if hasattr(msg, 'content') else 'No content'}")
+
+    public_thread_messages = [msg.content for msg in public_post.messages]
+    feedback_messages = [msg for msg in public_thread_messages if msg.startswith("**Feedback:**")]
+    if feedback_messages:
+        print(f"  SUCCESS: Found feedback message: {feedback_messages[0][:50]}...")
+    else:
+        print("  FAILED: No feedback message found in public-discussions thread")
+
     # Test discussions from different roles in the referendum thread
-    print("\n3. Testing discussion permissions in referendum thread")
+    print("\n4. Testing discussion permissions in referendum thread")
 
     # Add discussion from dao-team-representatives to the referendum
-    print("  3.1. Adding discussion from dao-team-representatives to referendum")
+    print("  4.1. Adding discussion from dao-team-representatives to referendum")
     await env.add_message_to_thread(
-        content="I support this proposal as it aligns with our roadmap.",
+        content="I support this proposal because it aligns with our goals.",
         thread_id=referendum.id,
         author_name="dao_rep2",
         forum_name="referendas"
@@ -292,9 +361,9 @@ async def run_default_scenario(env):
     print("  - dao_rep2 successfully added a comment")
 
     # Add discussion from dao-participants to the referendum
-    print("  3.2. Adding discussion from dao-participants to referendum")
+    print("  4.2. Adding discussion from dao-participants to referendum")
     await env.add_message_to_thread(
-        content="I have some questions about the implementation details.",
+        content="I think this is a good use of treasury funds.",
         thread_id=referendum.id,
         author_name="participant1",
         forum_name="referendas"
@@ -302,9 +371,9 @@ async def run_default_scenario(env):
     print("  - participant1 successfully added a comment")
 
     # Add discussion from jam-implementer to the referendum
-    print("  3.3. Adding discussion from jam-implementer to referendum")
+    print("  4.3. Adding discussion from jam-implementer to referendum")
     await env.add_message_to_thread(
-        content="I can provide technical insights on this implementation.",
+        content="I can help with the technical implementation if needed.",
         thread_id=referendum.id,
         author_name="implementer1",
         forum_name="referendas"
@@ -312,7 +381,7 @@ async def run_default_scenario(env):
     print("  - implementer1 successfully added a comment")
 
     # Simulate votes from dao-team-representatives (should succeed)
-    print("\n4. Testing voting permissions - dao-team-representatives vote (should succeed)")
+    print("\n5. Testing voting permissions - dao-team-representatives vote (should succeed)")
     votes = []
     for rep_name in ["dao_rep1", "dao_rep2", "dao_rep3", "dao_rep4", "dao_rep5"]:
         try:
@@ -332,12 +401,12 @@ async def run_default_scenario(env):
     # Calculate and display quorum
     eligible_users = env.get_quorum_eligible_users()
     quorum_percentage = env.calculate_quorum_percentage(len(votes))
-    print(f"\n5. Quorum calculation: {len(votes)} votes out of {len(eligible_users)} eligible representatives")
+    print(f"\n6. Quorum calculation: {len(votes)} votes out of {len(eligible_users)} eligible representatives")
     print(f"  - Quorum percentage: {quorum_percentage:.1f}%")
     print(f"  - Eligible users for quorum: {[user.name for user in eligible_users]}")
 
     # Test a non-representative (participant) trying to vote (should fail)
-    print("\n6. Testing permission restrictions - dao-participant tries to vote (should fail)")
+    print("\n7. Testing permission restrictions - dao-participant tries to vote (should fail)")
     try:
         non_rep_vote = await env.add_vote_to_referendum(
             thread=referendum,
@@ -349,7 +418,7 @@ async def run_default_scenario(env):
         print(f"  SUCCESS: {e}")
 
     # Test a non-representative (implementer) trying to vote (should fail)
-    print("\n7. Testing permission restrictions - jam-implementer tries to vote (should fail)")
+    print("\n8. Testing permission restrictions - jam-implementer tries to vote (should fail)")
     try:
         non_rep_vote = await env.add_vote_to_referendum(
             thread=referendum,
@@ -361,7 +430,7 @@ async def run_default_scenario(env):
         print(f"  SUCCESS: {e}")
 
     # Test a bot trying to vote (should fail)
-    print("\n8. Testing permission restrictions - bots try to vote (should fail)")
+    print("\n9. Testing permission restrictions - bots try to vote (should fail)")
     for bot_name in ["bot_user", "dotgov_bot", "search_bot", "booster_bot"]:
         try:
             bot_vote = await env.add_vote_to_referendum(
@@ -374,7 +443,7 @@ async def run_default_scenario(env):
             print(f"  SUCCESS: {bot_name} - {e}")
 
     # Add messages to the public discussion that was created earlier
-    print("\n9. Adding messages to the public discussion thread")
+    print("\n10. Adding messages to the public discussion thread")
 
     # Add messages to the public discussion from different roles
     await env.add_message_to_thread(
@@ -402,7 +471,7 @@ async def run_default_scenario(env):
     print("  - implementer1 successfully added a comment to public discussion")
 
     # Test bot interaction in public discussion
-    print("\n10. Testing bot interaction in public discussion")
+    print("\n11. Testing bot interaction in public discussion")
     await env.add_message_to_thread(
         content="I'll help track this proposal's status.",
         thread_id=public_post.id,

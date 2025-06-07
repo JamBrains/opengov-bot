@@ -697,7 +697,7 @@ async def participation_rate():
     try:
         await client.wait_until_ready()
         content = calculate_current_participation_rate(vote_counts, members)
-    
+
         # Writes content to discord
         channel = client.get_channel(config.DISCORD_SUMMARIZER_CHANNEL_ID)
         await channel.send(content=content)

@@ -11,14 +11,14 @@ def calculate_participation_rate_test():
             votes = json.loads(data)
     except FileNotFoundError:
         return "Votes file not found"
-    
+
     try:
         with io.open("bot/test/fixtures/members.json", "r") as file:
             data = file.read()
             members = json.loads(data)
     except FileNotFoundError:
         return "Members file not found"
-    
+
     return calculate_current_participation_rate(votes, members)
 
 if __name__ == "__main__":
