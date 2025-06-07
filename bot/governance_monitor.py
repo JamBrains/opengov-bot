@@ -280,6 +280,15 @@ class GovernanceMonitor(discord.Client):
                 return json.loads(data)
         except FileNotFoundError:
             return {}
+    
+    @staticmethod
+    async def load_voting_members():
+        try:
+            async with aiofiles.open("../data/members.json", "r") as file:
+                data = await file.read()
+                return json.loads(data)
+        except FileNotFoundError:
+            return {}
 
     async def save_vote_counts(self):
         async with aiofiles.open("../data/vote_counts.json", "w") as file:
@@ -462,7 +471,7 @@ class GovernanceMonitor(discord.Client):
         - Logs user interaction.
         - Fetches member and their roles from the guild.
         - Checks if the user has the necessary role to participate.
-        - If the user doesn’t have the required role, sends a message informing them.
+        - If the user doesn't have the required role, sends a message informing them.
         - Handles vote counting for "aye", "nay" buttons.
         - Throttles the user's ability to vote within a 15-second interval to prevent spam.
         - Updates the vote counts and informs the user of a successful vote.
@@ -854,8 +863,9 @@ class GovernanceMonitor(discord.Client):
             # Handle other types of exceptions or log them
             self.logger.error(f"An error occurred: {exc}")
 
-    # Synchronize the app commands to one guild.
+# Synchronize the app commands to one guild.
 #   async def setup_hook(self):
 #       # This copies the global commands over to your guild.
 #       self.tree.copy_global_to(guild=self.guild)
 #       await self.tree.sync(guild=self.guild)
+        
