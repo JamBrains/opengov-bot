@@ -2,6 +2,7 @@ import time
 import json
 import discord
 import asyncio
+import re
 from utils.config import Config
 from utils.logger import Logger
 from utils.gov2 import OpenGovernance2
@@ -861,6 +862,143 @@ if __name__ == '__main__':
             finally:
                 await substrate.close()
 
+    # Add a new /feedback command that allows dao-team-representatives to provide anonymous feedback
+    # from threads in the referendas channel that will be posted to the public-discussions channel
+    @client.tree.command(name='feedback',
+                     description='Post anonymous feedback about this referendum to the public-discussions channel',
+                     guild=discord.Object(id=config.DISCORD_SERVER_ID))
+    async def feedback(interaction: discord.Interaction, message: str):
+        """
+        Post anonymous feedback about a referendum in the public-discussions channel from the referendas channel
+        
+        Args:
+            interaction (discord.Interaction): The interaction object
+            message (str): The feedback message to post
+        """
+        # Defer the response to give us time to process
+        await interaction.response.defer(ephemeral=True)
+        
+        # Get the user's roles to check permissions
+        user_id = interaction.user.id
+        member = await interaction.guild.fetch_member(user_id)
+        roles = member.roles
+        
+        # Check if the user has the dao-team-representative role
+        has_representative_role = False
+        for role in roles:
+            if role.name == "dao-team-representative" or role.name == "Admin":
+                has_representative_role = True
+                break
+                
+        if not has_representative_role:
+            await interaction.followup.send(
+                "You don't have permission to use this command. Only users with the @dao-team-representative role can provide feedback.",
+                ephemeral=True
+            )
+            return
+        
+        # Check if the command is being used in a thread in the referendas channel
+        channel = interaction.channel
+        if not isinstance(channel, discord.Thread) or not hasattr(channel, 'parent_id') or channel.parent_id != config.DISCORD_FORUM_CHANNEL_ID:
+            await interaction.followup.send(
+                "This command can only be used in threads within the #referendas channel.",
+                ephemeral=True
+            )
+            return
+            
+        try:
+            # Extract the referendum number from the thread name
+            # Expected format: "123: Title" or "1234: Title" where the referendum number is the number before the colon
+            thread_name = channel.name
+            referendum_number = None
+            
+            # Try to extract the referendum number from the referenda number in the thread name
+            match = re.search(r'^#?(\d+):', thread_name)
+            if match:
+                referendum_number = match.group(1)
+            else:
+                await interaction.followup.send(
+                    "Could not determine the referendum number from this thread's name.",
+                    ephemeral=True
+                )
+                return
+                
+            # Get the public-discussions channel
+            public_channel = client.get_channel(config.DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID)
+            if not public_channel:
+                await interaction.followup.send(
+                    "Public-discussions channel not found. Please ask an administrator to set up the DISCORD_PUBLIC_DISCUSSION_CHANNEL_ID.",
+                    ephemeral=True
+                )
+                return
+                
+            # Look for an existing thread in public-discussions with the format 'Ref 1234:'
+            pattern = rf'^Ref\s+{re.escape(str(referendum_number))}:'
+            existing_thread = None
+            for thread in public_channel.threads:
+                if re.match(pattern, thread.name):
+                    existing_thread = thread
+                    break
+                    
+            # If no existing thread is found, create a new one
+            if not existing_thread:
+                # Create a new thread in the public-discussions channel
+                # For forum channels, we need to create a forum post first
+                if isinstance(public_channel, discord.ForumChannel):
+                    # Prepare the initial post content
+                    initial_content = f"This is the public discussion thread for Referendum #{referendum_number}. Team representatives can provide anonymous feedback here."
+                    
+                    # Check if there are any available tags we should apply
+                    applied_tags = []
+                    if hasattr(public_channel, 'available_tags') and public_channel.available_tags:
+                        # Look for a 'Discussion' or 'Feedback' tag if available
+                        for tag in public_channel.available_tags:
+                            if tag.name.lower() in ['discussion', 'feedback', 'public']:
+                                applied_tags.append(tag)
+                                break
+                    
+                    # Create a forum post which automatically creates a thread
+                    try:
+                        new_thread = await public_channel.create_thread(
+                            name=f"Ref {thread_name}",
+                            content=initial_content,
+                            applied_tags=applied_tags if applied_tags else None,
+                            auto_archive_duration=10080  # 7 days
+                        )
+                        # In discord.py, create_thread on a forum channel returns the thread directly
+                        existing_thread = new_thread
+                    except Exception as e:
+                        logging.error(f"Error creating forum thread: {e}")
+                        await interaction.followup.send(
+                            "Error creating thread in public-discussions channel. Please contact an administrator.",
+                            ephemeral=True
+                        )
+                        return
+                else:
+                    # For text channels, create a thread directly
+                    initial_message = await public_channel.send(f"Ref {thread_name}")
+                    new_thread = await initial_message.create_thread(
+                        name=f"Ref {thread_name}",
+                        auto_archive_duration=10080  # 7 days
+                    )
+                    existing_thread = new_thread
+                
+            # Post the feedback message to the thread
+            await existing_thread.send(f"**Feedback:** {message}")
+            
+            # Confirm to the user that their feedback was posted
+            await interaction.followup.send(
+                f"Your feedback has been anonymously posted to the public-discussions channel.",
+                ephemeral=True
+            )
+            
+        except Exception as error:
+            logging.exception(f"An error occurred while processing feedback: {error}")
+            await interaction.followup.send(
+                "An error occurred while processing your feedback. Please try again later.",
+                ephemeral=True
+            )
+    
     # Slash command(s) available when solo mode IS enabled in the .env config
     # Commands:
     #   + /vote <referendum> <conviction> <decision>
