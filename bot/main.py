@@ -14,6 +14,7 @@ from utils.button_handler import ButtonHandler, ExternalLinkButton
 from utils.task_handler import TaskHandler
 from utils.argument_parser import ArgumentParser
 from utils.permission_check import PermissionCheck
+from utils.participation_rate import calculate_current_participation_rate
 from discord import app_commands, Embed
 from discord.ext import tasks
 
@@ -679,6 +680,34 @@ async def recheck_proposals():
     finally:
         await substrate.close()
 
+@tasks.loop(hours=24)
+
+async def participation_rate():
+    """
+    Periodically checks participation rate
+
+    Function workflow:
+        - loads current members list from data/members.json
+        - laods vote_counts from data/vote_counts.json
+        - checks how many votes have been casted by particular member and calculates participation rate in %
+        - post to discord DISCORD_SUMMARIZER_CHANNEL_ID
+    """
+    vote_counts = await client.load_vote_counts()
+    members = await client.load_voting_members()
+    try:
+        await client.wait_until_ready()
+        content = calculate_current_participation_rate(vote_counts, members)
+    
+        # Writes content to discord
+        channel = client.get_channel(config.DISCORD_SUMMARIZER_CHANNEL_ID)
+        await channel.send(content=content)
+    except Exception as e:
+        logging.error(f"An unexpected error occurred whilst running [participation_rate]: {e}")
+
+
+@participation_rate.before_loop
+async def before_participation_rate():
+    participation_rate.get_task().set_name('participation_rate')
 
 @check_governance.before_loop
 async def before_governance():

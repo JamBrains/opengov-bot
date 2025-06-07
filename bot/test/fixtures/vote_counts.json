@@ -1,0 +1,809 @@
+{
+  "1370468047659470990": {
+    "index": "1559",
+    "title": "Kick-start Campaign for RISC-V Smart Home Devices, Secured by Polkadot",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 3,
+    "nay": 8,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "aye"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "recuse"
+      },
+      "407492130655961088": {
+        "username": "uhqurr676##",
+        "vote_type": "nay"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "937323747998855208": {
+        "username": "lfpbhn130##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1746815445
+  },
+  "1371827000708304917": {
+    "index": "1563",
+    "title": "\u00ab\u00a0VOTE NAY\u00a0\u00bb",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 0,
+    "nay": 10,
+    "recuse": 1,
+    "users": {
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "recuse"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "407492130655961088": {
+        "username": "uhqurr676##",
+        "vote_type": "nay"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747139444
+  },
+  "1371872300609044544": {
+    "index": "1564",
+    "title": "Funding Proposal: Bounty Hub",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 3,
+    "nay": 5,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "407492130655961088": {
+        "username": "uhqurr676##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      }
+    },
+    "epoch": 1747150245
+  },
+  "1372640967080804456": {
+    "index": "1567",
+    "title": "Marketing and PR Proposal for Polkadot Brand Awareness in APAC by PANews",
+    "origin": [
+      "SmallSpender"
+    ],
+    "aye": 0,
+    "nay": 8,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "recuse"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747333509
+  },
+  "1372659539463241768": {
+    "index": "1570",
+    "title": "NFT Mozaic\u2019s MVP Grants Program",
+    "origin": [
+      "BigSpender"
+    ],
+    "aye": 1,
+    "nay": 5,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "recuse"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "aye"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747337937
+  },
+  "1372840719219163186": {
+    "index": "1572",
+    "title": "Retroactive Fund - Optimizing Polkadot Multisig: Mimir\u2019s Enhanced Features & Ecosystem Integration",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 5,
+    "nay": 4,
+    "recuse": 0,
+    "users": {
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "aye"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "407492130655961088": {
+        "username": "uhqurr676##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747381133
+  },
+  "1372886017635516419": {
+    "index": "1573",
+    "title": "Polkadot Community Foundation - Polkadot App - Treasury Funding #01",
+    "origin": [
+      "BigSpender"
+    ],
+    "aye": 0,
+    "nay": 10,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "407492130655961088": {
+        "username": "uhqurr676##",
+        "vote_type": "nay"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "nay"
+      },
+      "937323747998855208": {
+        "username": "lfpbhn130##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747391934
+  },
+  "1373654253973016600": {
+    "index": "1574",
+    "title": "W3PI Token Index \u2013 Bounty Proposal for Development, Swiss GmbH & Legal Trust Foundation",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 0,
+    "nay": 6,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "recuse"
+      }
+    },
+    "epoch": 1747575095
+  },
+  "1374061941374582794": {
+    "index": "1575",
+    "title": "Milestone 1 - Accelerating Polkadot Adoption via Inter Miami CF Fan Engagement",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 0,
+    "nay": 7,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "nay"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      },
+      "939812779941068811": {
+        "username": "qvswqe644##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747672296
+  },
+  "1374424334986383492": {
+    "index": "1576",
+    "title": "N3MUS -  is the go-to gamer acquisition platform, powering high-performing on-chain tournaments that drive real engagement.",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 1,
+    "nay": 2,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "recuse"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747758697
+  },
+  "1374809487549923418": {
+    "index": "1579",
+    "title": "Payout approved by Ref 703 expired - Encode Club",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 7,
+    "nay": 0,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "658302060973785110": {
+        "username": "syzhfy635##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "aye"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "aye"
+      }
+    },
+    "epoch": 1747850524
+  },
+  "1375126541620613172": {
+    "index": "1580",
+    "title": "Epico: Ethereum Wallet Compatibility for Polkadot SDK Chains",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 2,
+    "nay": 4,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "937323747998855208": {
+        "username": "lfpbhn130##",
+        "vote_type": "nay"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1747926116
+  },
+  "1376974030023692289": {
+    "index": "1582",
+    "title": "Ignore",
+    "origin": [
+      "SmallSpender"
+    ],
+    "aye": 0,
+    "nay": 5,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "939812779941068811": {
+        "username": "qvswqe644##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1748366592
+  },
+  "1376974060025807019": {
+    "index": "1583",
+    "title": "[Retroactive] Funding for Gitorial VS Code Extension (Interactive Git Tutorials)",
+    "origin": [
+      "SmallSpender"
+    ],
+    "aye": 4,
+    "nay": 2,
+    "recuse": 0,
+    "users": {
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "937323747998855208": {
+        "username": "lfpbhn130##",
+        "vote_type": "nay"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "1221888259421114368": {
+        "username": "ojfcum764##",
+        "vote_type": "aye"
+      }
+    },
+    "epoch": 1748366599
+  },
+  "1377381713562435705": {
+    "index": "1584",
+    "title": "Marketing Bounty Refill May 2025",
+    "origin": [
+      "Treasurer"
+    ],
+    "aye": 3,
+    "nay": 2,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "recuse"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1748463791
+  },
+  "1377698804471435296": {
+    "index": "1585",
+    "title": "Avatar Accounts: Bringing The Whole Web3 To Polkadot",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 0,
+    "nay": 4,
+    "recuse": 1,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1748539392
+  },
+  "1378015892557795511": {
+    "index": "1586",
+    "title": "Merkle Science paving the way for institutional adoption and DeFi Innovation",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 5,
+    "nay": 0,
+    "recuse": 0,
+    "users": {
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      }
+    },
+    "epoch": 1748614991
+  },
+  "1378106488903434380": {
+    "index": "1587",
+    "title": "Snowbridge 2025/2026 Milestone Payouts",
+    "origin": [
+      "BigSpender"
+    ],
+    "aye": 2,
+    "nay": 3,
+    "recuse": 1,
+    "users": {
+      "430139889858773005": {
+        "username": "cerxbt892##",
+        "vote_type": "nay"
+      },
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "nay"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "recuse"
+      }
+    },
+    "epoch": 1748636591
+  },
+  "1379465441910722622": {
+    "index": "1588",
+    "title": "Curator Reinstatements & Bounty Housekeeping",
+    "origin": [
+      "Treasurer"
+    ],
+    "aye": 3,
+    "nay": 1,
+    "recuse": 0,
+    "users": {
+      "439032863904628745": {
+        "username": "arjscr362##",
+        "vote_type": "aye"
+      },
+      "371935928509267970": {
+        "username": "vztswr400##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1748960591
+  },
+  "1379691935660249221": {
+    "index": "1589",
+    "title": "dAppForge Milestone 4",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 3,
+    "nay": 0,
+    "recuse": 0,
+    "users": {
+      "548618495383044129": {
+        "username": "thwjvz533##",
+        "vote_type": "aye"
+      },
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "aye"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      }
+    },
+    "epoch": 1749014591
+  },
+  "1379873136589148272": {
+    "index": "1590",
+    "title": "#1590 Gossamer: Core Contributions to Polkadot [Q3/Q4 2025]",
+    "origin": [
+      "BigSpender"
+    ],
+    "aye": 1,
+    "nay": 0,
+    "recuse": 1,
+    "users": {
+      "819213798165577818": {
+        "username": "lmbouf294##",
+        "vote_type": "recuse"
+      },
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "aye"
+      }
+    },
+    "epoch": 1749057793
+  },
+  "1379873166155059251": {
+    "index": "1591",
+    "title": "Polkadot Community Foundation (PCF) - Proposal for Renewed Funding for One Year",
+    "origin": [
+      "BigSpender"
+    ],
+    "aye": 0,
+    "nay": 1,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1749057800
+  },
+  "1380190220875595829": {
+    "index": "1592",
+    "title": "Pudgy Penguins <> Mubert Protocol Events Tour, Powered by Polkadot",
+    "origin": [
+      "MediumSpender"
+    ],
+    "aye": 0,
+    "nay": 2,
+    "recuse": 0,
+    "users": {
+      "315644537865240576": {
+        "username": "zcenqr706##",
+        "vote_type": "nay"
+      },
+      "939812779941068811": {
+        "username": "qvswqe644##",
+        "vote_type": "nay"
+      }
+    },
+    "epoch": 1749133392
+  }
+}
