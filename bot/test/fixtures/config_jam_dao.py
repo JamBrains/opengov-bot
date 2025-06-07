@@ -68,7 +68,7 @@ FORUM_CHANNELS = [
         "vote_access": ["dao-team-representative", "Admin"]
     },
     {"name": "administrative-forum", "category": "DAO", "tags": None},
-    {"name": "public-discussions", "category": None, "tags": None}
+    {"name": "public-discussions", "category": "DAO", "tags": None}
 ]
 
 # Users with their roles
