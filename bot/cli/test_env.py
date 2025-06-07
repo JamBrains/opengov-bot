@@ -343,20 +343,20 @@ async def run_default_scenario(env):
     # If no feedback message was found, add it directly for testing purposes
     from bot.test.mocks.message import MockMessage
     from bot.test.mocks.user import MockUser
-    
+
     # Check if feedback message already exists
     public_thread_messages = [msg.content for msg in public_post.messages]
     feedback_messages = [msg for msg in public_thread_messages if msg.startswith("**Feedback:**")]
-    
+
     if not feedback_messages:
         # Create a bot user to be the author of the feedback message
         bot_user = MockUser(0, "JAM-DAO-Bot", True)
-        
+
         # Create the feedback message
         msg_id = len(public_post.messages) + 1
         feedback_content = "**Feedback:** I think this is a good proposal."
         print(f"  DEBUG: Adding feedback message directly to public_post: {feedback_content}")
-        
+
         # Create a MockMessage object and add it to the thread's messages list
         feedback_msg = MockMessage(
             id=msg_id,
@@ -365,10 +365,10 @@ async def run_default_scenario(env):
             channel=public_post,
             guild=public_post.guild
         )
-        
+
         public_post.messages.append(feedback_msg)
         print(f"  DEBUG: public_post now has {len(public_post.messages)} messages")
-    
+
     # Check again for feedback messages
     public_thread_messages = [msg.content for msg in public_post.messages]
     feedback_messages = [msg for msg in public_thread_messages if msg.startswith("**Feedback:**")]
